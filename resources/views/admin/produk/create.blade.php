@@ -127,7 +127,7 @@ class="form-control">
             type="number"
             name="tinggi"
             class="form-control"
-            value="{{ old('tinghi,0) }}"
+            value="{{ old('tinggi',0) }}"
             min="0"
             required>
     </div>
@@ -152,10 +152,8 @@ Simpan
 </button>
 
 <a href="{{ route('produk.index') }}"
-class="btn btn-secondary">
-
-Kembali
-
+    class="btn btn-secondary">
+    Kembali
 </a>
 
 </form>

@@ -32,7 +32,7 @@
                             <th>No</th>
                             <th>Kode</th>
                             <th>Tanggal</th>
-                            <th>Kasir</th>
+                            <th>Pelanggan</th>
                             <th>Total</th>
                             <th>Bayar</th>
                             <th>Kembalian</th>
@@ -53,7 +53,7 @@
 
                             <td>{{ $transaksi->tanggal_transaksi }}</td>
 
-                            <td>{{ $transaksi->user->name }}</td>
+                            <td>{{ $transaksi->nama_penerima }}</td>
 
                             <td>
                                 Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}
@@ -68,9 +68,9 @@
                             </td>
 
                           <td>
-                                @if($transaksi->status == 'Menunggu Pembayaran')
+                                @if($transaksi->status == 'Menunggu Verifikasi')
                                     <span class="badge bg-warning">
-                                        Menunggu Pembayaran
+                                        Menunggu Verifikasi
                                     </span>
 
                                 @elseif($transaksi->status == 'Diproses')
@@ -101,8 +101,19 @@
                                         <strong>Status:</strong>
                                        @if($transaksi->pengiriman->status == 'menunggu')
                                             <span class="badge bg-warning">Menunggu</span>
+
+                                        @elseif($transaksi->pengiriman->status == 'diproses')
+                                            <span class="badge bg-info">Diproses</span>
+
+                                        @elseif($transaksi->pengiriman->status == 'dikemas')
+                                            <span class="badge bg-primary">Dikemas</span>
+
                                         @elseif($transaksi->pengiriman->status == 'dikirim')
                                             <span class="badge bg-success">Dikirim</span>
+
+                                        @elseif($transaksi->pengiriman->status == 'selesai')
+                                            <span class="badge bg-dark">Selesai</span>
+
                                         @else
                                             <span class="badge bg-secondary">
                                                 {{ ucfirst($transaksi->pengiriman->status) }}
@@ -145,7 +156,7 @@
                                                         @endif
                                                     </div>
 
-                                 @if($transaksi->pengiriman->status != 'dikirim')
+                                    @if($transaksi->pengiriman->status != 'selesai')
 
                                     <form action="{{ route('kasir.pengiriman.resi',$transaksi->id) }}"
                                         method="POST"
@@ -167,22 +178,49 @@
                                     </form>
 
                                     @endif
-                                    @if($transaksi->pengiriman->status != 'dikirim')
+                                  @if($transaksi->pengiriman->status != 'selesai')
+                                       <form action="{{ route('kasir.pengiriman.status',$transaksi->id) }}"
+                                    method="POST">
 
-                                        <form action="{{ route('kasir.pengiriman.status',$transaksi->id) }}"
-                                            method="POST">
+                                    @csrf
+                                    @method('PUT')
 
-                                            @csrf
-                                            @method('PUT')
+                                    <select name="status"
+                                        class="form-select form-select-sm mb-2"
+                                        required>
 
-                                            <button class="btn btn-success btn-sm w-100">
-                                                Tandai Dikirim
-                                            </button>
+                                        <option value="menunggu"
+                                            {{ $transaksi->pengiriman->status == 'menunggu' ? 'selected' : '' }}>
+                                            Menunggu
+                                        </option>
 
-                                        </form>
+                                        <option value="diproses"
+                                            {{ $transaksi->pengiriman->status == 'diproses' ? 'selected' : '' }}>
+                                            Diproses
+                                        </option>
 
-                                        @endif
+                                        <option value="dikemas"
+                                            {{ $transaksi->pengiriman->status == 'dikemas' ? 'selected' : '' }}>
+                                            Dikemas
+                                        </option>
 
+                                        <option value="dikirim"
+                                            {{ $transaksi->pengiriman->status == 'dikirim' ? 'selected' : '' }}>
+                                            Dikirim
+                                        </option>
+
+                                        <option value="selesai"
+                                            {{ $transaksi->pengiriman->status == 'selesai' ? 'selected' : '' }}>
+                                            Selesai
+                                        </option>
+
+                                    </select>
+
+                                    <button class="btn btn-success btn-sm w-100">
+                                        Simpan Status
+                                    </button>
+
+                                </form>
                                 @else
 
                                     <span class="text-muted">
@@ -191,63 +229,72 @@
 
                                 @endif
 
-                               </td>
+                            @endif   
 
-                        <td>
+                            </td>
 
-                            <a href="{{ route('kasir.detail',$transaksi->id) }}"
-                            class="btn btn-info btn-sm mb-1">
-                                Detail
-                            </a>
 
-                            @if($transaksi->pembayaran && $transaksi->pembayaran->status == 'Menunggu Verifikasi')
+                    <td>
 
-                                <form action="{{ route('kasir.verifikasi',$transaksi->id) }}"
-                                    method="POST"
-                                    class="d-inline">
+                <a href="{{ route('kasir.detail',$transaksi->id) }}"
+                    class="btn btn-info btn-sm mb-1">
+                    Detail
+                </a>
 
-                                    @csrf
-                                    @method('PUT')
+                <a href="{{ route('kasir.buktiPembayaran',$transaksi->id) }}"
+                    class="btn btn-warning btn-sm mb-1">
+                    Bukti Pembayaran
+                </a>
 
-                                    <button class="btn btn-primary btn-sm mb-1">
-                                        Verifikasi
-                                    </button>
+                <a href="{{ route('kasir.buktiProduk',$transaksi->id) }}"
+                    class="btn btn-secondary btn-sm mb-1">
+                    Foto Produk
+                </a>
 
-                                </form>
+                @if($transaksi->pembayaran && $transaksi->pembayaran->status == 'Menunggu Verifikasi')
+                    <form action="{{ route('kasir.verifikasi',$transaksi->id) }}"
+                        method="POST"
+                        class="d-inline">
 
-                            @endif
+                        @csrf
+                        @method('PUT')
 
-                            @if($transaksi->bayar > 0 && $transaksi->status != 'Selesai')
+                        <button class="btn btn-primary btn-sm mb-1">
+                            Verifikasi
+                        </button>
 
-                                <form action="{{ route('kasir.selesai',$transaksi->id) }}"
-                                    method="POST"
-                                    class="d-inline">
+                    </form>
+                @endif
 
-                                    @csrf
-                                    @method('PUT')
+                @if($transaksi->bayar > 0 && $transaksi->status != 'Selesai')
+                    <form action="{{ route('kasir.selesai',$transaksi->id) }}"
+                        method="POST"
+                        class="d-inline">
 
-                                    <button class="btn btn-success btn-sm mb-1">
-                                        Selesai
-                                    </button>
+                        @csrf
+                        @method('PUT')
 
-                                </form>
+                        <button class="btn btn-success btn-sm mb-1">
+                            Selesai
+                        </button>
 
-                            @endif
+                    </form>
+                @endif
 
-                            <form action="{{ route('kasir.destroy',$transaksi->id) }}"
-                                method="POST"
-                                onsubmit="return confirm('Hapus transaksi ini?')">
+                <form action="{{ route('kasir.destroy',$transaksi->id) }}"
+                    method="POST"
+                    onsubmit="return confirm('Hapus transaksi ini?')">
 
-                                @csrf
-                                @method('DELETE')
+                    @csrf
+                    @method('DELETE')
 
-                                <button class="btn btn-danger btn-sm">
-                                    Hapus
-                                </button>
+                    <button class="btn btn-danger btn-sm">
+                        Hapus
+                    </button>
 
-                            </form>
-
-                        </td>
+                </form>
+    
+            </td>
 
                         </tr>
 

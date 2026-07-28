@@ -20,6 +20,7 @@
     <th>Kode</th>
     <th>Tanggal</th>
     <th>Total</th>
+    <th>Ongkir</th>
     <th>Kurir</th>
     <th>Layanan</th>
     <th>Resi</th>
@@ -42,6 +43,10 @@
 <td>{{ $transaksi->tanggal_transaksi }}</td>
 
 <td>Rp {{ number_format($transaksi->total_harga) }}</td>
+
+<td>
+    Rp {{ number_format($transaksi->ongkir,0,',','.') }}
+</td>
 
 <td>
     @if($transaksi->pengiriman)
@@ -78,33 +83,33 @@
 
 @if($transaksi->pengiriman)
 
-    @if($transaksi->pengiriman->status == 'Menunggu Pembayaran')
+    @if($transaksi->pengiriman->status == 'menunggu')
 
         <span class="badge bg-warning">
-            Menunggu Pembayaran
+            Menunggu
         </span>
 
-    @elseif($transaksi->pengiriman->status == 'Diproses')
+    @elseif($transaksi->pengiriman->status == 'diproses')
 
         <span class="badge bg-info">
             Diproses
         </span>
 
-    @elseif($transaksi->pengiriman->status == 'Dikemas')
+    @elseif($transaksi->pengiriman->status == 'dikemas')
 
         <span class="badge bg-primary">
             Dikemas
         </span>
 
-    @elseif($transaksi->pengiriman->status == 'Dikirim')
+    @elseif($transaksi->pengiriman->status == 'dikirim')
 
         <span class="badge bg-success">
             Dikirim
         </span>
 
-    @elseif($transaksi->pengiriman->status == 'Selesai')
+    @elseif($transaksi->pengiriman->status == 'selesai')
 
-        <span class="badge bg-success">
+        <span class="badge bg-dark">
             Selesai
         </span>
 
@@ -119,43 +124,45 @@
 </td>
 
 <td>
+    @if($transaksi->status == 'Belum Bayar')
 
+        <span class="badge bg-warning">
+            Belum Bayar
+        </span>
 
-@if($transaksi->status == 'Menunggu Pembayaran')
+    @elseif($transaksi->status == 'Menunggu Verifikasi')
 
-    <span class="badge bg-warning">
-        Menunggu Pembayaran
-    </span>
+        <span class="badge bg-secondary">
+            Menunggu Verifikasi
+        </span>
 
-@elseif($transaksi->status == 'Menunggu Verifikasi')
+    @elseif($transaksi->status == 'Diproses')
 
-    <span class="badge bg-secondary">
-        Menunggu Verifikasi
-    </span>
+        <span class="badge bg-info">
+            Diproses
+        </span>
 
-@elseif($transaksi->status == 'Diproses')
+    @elseif($transaksi->status == 'Selesai')
 
-    <span class="badge bg-info">
-        Diproses
-    </span>
+        <span class="badge bg-success">
+            Selesai
+        </span>
 
-    @elseif($transaksi->status == 'Dikirim')
-
-    <span class="badge bg-success">
-        Dikirim
-    </span>
-
-@elseif($transaksi->status == 'Selesai')
-
-    <span class="badge bg-success">
-        Selesai
-    </span>
-
-@endif
-
+    @endif
 </td>
+
 <td>
-    <form action="{{ route('pelanggan.destroyTransaksi', $transaksi->id) }}"
+
+    @if($transaksi->status == 'Selesai')
+        <button
+            class="btn btn-success btn-sm mb-1"
+            data-bs-toggle="modal"
+            data-bs-target="#uploadFoto{{ $transaksi->id }}">
+            Upload Foto Produk
+        </button>
+    @endif
+
+    <form action="{{ route('pelanggan.destroyTransaksi',$transaksi->id) }}"
           method="POST"
           onsubmit="return confirm('Yakin ingin menghapus pesanan ini?')">
 
@@ -167,17 +174,62 @@
         </button>
 
     </form>
+
 </td>
+
 </tr>
+
+<!-- Modal Upload -->
+<div class="modal fade" id="uploadFoto{{ $transaksi->id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form action="{{ route('pelanggan.uploadFotoProduk',$transaksi->id) }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload Foto Produk</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="file"
+                           name="foto_produk"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png"
+                           required>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Batal
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Upload
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
 
 @empty
 
 <tr>
-
-<td colspan="10" class="text-center">
-    Belum ada transaksi
-</td>
-
+    <td colspan="11" class="text-center">
+        Belum ada transaksi
+    </td>
 </tr>
 
 @endforelse

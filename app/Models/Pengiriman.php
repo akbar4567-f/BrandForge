@@ -19,6 +19,7 @@ class Pengiriman extends Model
         'nomor_resi',
         'status',
         'catatan',
+        'foto_produk',
     ];
 
 

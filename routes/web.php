@@ -124,11 +124,6 @@
                ->name('admin.pengiriman.resi');
 
 
-            Route::get('/admin/pengiriman/{id}/label',[ShippingController::class, 'printLabel'])
-               ->name('admin.pengiriman.label');
-
-                    });
-
         // KASIR
 
         Route::middleware('role:owner,kasir')->group(function () {
@@ -163,9 +158,18 @@
             Route::put('/kasir/pengiriman/{id}/resi', [ KasirController::class,'updateResi'   ])
                ->name('kasir.pengiriman.resi');
 
-
             Route::put('/kasir/pengiriman/{id}/status', [  KasirController::class,'updateStatusKirim'  ])
                ->name('kasir.pengiriman.status');
+
+            Route::get('/kasir/pengiriman/{id}/label',[KasirController::class, 'printLabel'])
+               ->name('kasir.pengiriman.label');
+
+         Route::get('/kasir/transaksi/{id}/bukti', [KasirController::class, 'buktiPembayaran'])
+            ->name('kasir.buktiPembayaran');
+
+        Route::get('/kasir/transaksi/{id}/produk', [KasirController::class, 'buktiProduk'])
+            ->name('kasir.buktiProduk');
+        });
 
 
         });
@@ -235,11 +239,15 @@
                 ->name('pelanggan.riwayat');
 
             // Tracking Pengiriman
-            Route::get('/pesanan/{id}/tracking',[ShippingController::class, 'tracking'])
-             ->name('pelanggan.tracking');
+           Route::get('/pelanggan/pesanan/{id}/tracking',[ShippingController::class,'tracking'])
+                 ->name('pelanggan.tracking');
 
-            Route::delete('/pelanggan/transaksi/{id}', [PelangganController::class, 'destroyTransaksi'])
+            Route::delete('/pelanggan/transaksi/{id}',[PelangganController::class, 'destroyTransaksi'])
                   ->name('pelanggan.destroyTransaksi');
+
+            // Upload Foto Produk Setelah Barang Diterima
+            Route::post('/pelanggan/upload-foto-produk/{id}',[PelangganController::class,'uploadFotoProduk'])
+                ->name('pelanggan.uploadFotoProduk');
 
         });
 

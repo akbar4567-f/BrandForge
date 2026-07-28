@@ -100,35 +100,39 @@
         </div>
 
     </div>
+      @php
+        $ongkir = 10000;
+        $totalPembayaran = $hargaProduk + $ongkir;
+    @endphp
 
-    <div class="card pembayaran-detail">
+        <div class="card pembayaran-detail">
 
             <h3>🛒 Detail Pembayaran</h3>
 
-            <table class="table">
-                <tr>
-                    <td>Harga Produk</td>
-                    <td>
-                        Rp {{ number_format($hargaProduk,0,',','.') }}
-                    </td>
-                </tr>
+                    <table class="table">
+                       <tr>
+                        <td>Harga Produk</td>
+                        <td>
+                            Rp {{ number_format($hargaProduk,0,',','.') }}
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td>Ongkir Bandung</td>
-                    <td>
-                        Rp {{ number_format($ongkir,0,',','.') }}
-                    </td>
-                </tr>
+                    <tr>
+                        <td>Ongkir Bandung</td>
+                        <td>
+                            Rp {{ number_format($ongkir,0,',','.') }}
+                        </td>
+                    </tr>
 
-                <tr>
-                    <th>Total Pembayaran</th>
-                    <th>
-                        Rp {{ number_format($totalPembayaran,0,',','.') }}
-                    </th>
-                </tr>
-            </table>
+                    <tr>
+                        <th>Total Pembayaran</th>
+                        <th>
+                            Rp {{ number_format($totalPembayaran,0,',','.') }}
+                        </th>
+                    </tr>
+                    </table>
 
-        </div>
+                </div>
 
 
     <div class="card shadow">

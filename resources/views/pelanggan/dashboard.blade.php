@@ -8,8 +8,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h2>Dashboard status</h2>
-
+       <h2>Dashboard Status</h2>
         @if(Auth::user()->role == 'owner')
             <a href="{{ route('owner.index') }}" class="btn btn-warning">
                 <i class="bi bi-speedometer2"></i> Dashboard Owner
@@ -29,6 +28,15 @@
                 <div class="card-body">
                     <h5>Total Pesanan</h5>
                     <h2>{{ $totalPesanan }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-secondary text-white">
+                <div class="card-body">
+                    <h5>Menunggu Verifikasi</h5>
+                    <h2>{{ $menungguVerifikasi }}</h2>
                 </div>
             </div>
         </div>
@@ -59,6 +67,14 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3 mb-3">
+    <div class="card text-center bg-primary text-white">
+        <div class="card-body">
+            <h5>Dikirim</h5>
+            <h2>{{ $dikirim }}</h2>
+        </div>
+    </div>
+</div>
 
     </div>
 
@@ -71,7 +87,6 @@
         <a href="{{ route('pelanggan.riwayat') }}" class="btn btn-success">
             📋 Riwayat Pesanan
         </a>
-
     </div>
 
 </div>

@@ -12,11 +12,6 @@
        <a href="/owner" class="btn btn-primary">
             Dashboard Owner
         </a>
-
-        
-        <a href="{{ route('website.home') }}" class="btn btn-primary">
-        <i class="bi bi-globe"></i> Website
-    </a>
 </div>
     @endif
 

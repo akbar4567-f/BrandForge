@@ -27,7 +27,7 @@ class KasirController extends Controller
         return view('kasir.index', compact(
             'menungguVerifikasi',
             'diproses',
-            'selesai'
+            'selesai',
         ));
     }
 
@@ -69,23 +69,18 @@ class KasirController extends Controller
                 return back()->with('error', 'Uang pembayaran kurang.');
             }
 
-           $transaksi = Transaksi::create([
-
-                'user_id' => Auth::id(),
-
-                'kode_transaksi' => 'TRX-'.date('YmdHis'),
-
-                'tanggal_transaksi' => now(),
-
-                'total_harga' => $subtotal,
-
-                'bayar' => $request->bayar,
-
-                'kembalian' => $request->bayar - $subtotal,
-
-                'status' => 'Diproses'
-
-            ]);
+          $transaksi = Transaksi::create([
+            'user_id' => Auth::id(),
+            'nama_penerima' => Auth::user()->name,
+            'alamat' => '-',
+            'no_hp' => '-',
+            'kode_transaksi' => 'TRX-'.date('YmdHis'),
+            'tanggal_transaksi' => now(),
+            'total_harga' => $subtotal,
+            'bayar' => $request->bayar,
+            'kembalian' => $request->bayar - $subtotal,
+            'status' => 'Diproses',
+        ]);
 
             DetailTransaksi::create([
                 'transaksi_id' => $transaksi->id,
@@ -186,19 +181,13 @@ class KasirController extends Controller
                 'status' => 'Terverifikasi'
             ]);
         }
-        Pengiriman::firstOrCreate(
-            [
-                'transaksi_id' => $transaksi->id
-            ],
-            [
-                'kurir' => '',
-                'layanan' => '',
-                'ongkir' => $transaksi->ongkir,
-                'nomor_resi' => '',
-                'status' => 'menunggu',
-                'catatan' => ''
-            ]   
-        );
+       $pengiriman = Pengiriman::where('transaksi_id', $transaksi->id)->first();
+
+            if ($pengiriman) {
+                $pengiriman->update([
+                    'status' => 'menunggu'
+                ]);
+            }
 
         return redirect()->route('kasir.riwayat')
             ->with('success', 'Pembayaran berhasil diverifikasi.');
@@ -223,44 +212,64 @@ class KasirController extends Controller
             'nomor_resi' => 'required',
         ]);
 
-        Pengiriman::updateOrCreate(
-        [
-            'transaksi_id' => $id
-        ],
-        [
-            'kurir' => '',
-            'layanan' => '',
-            'ongkir' => 0,
+        $pengiriman = Pengiriman::where('transaksi_id', $id)->firstOrFail();
+
+        $pengiriman->update([
             'nomor_resi' => $request->nomor_resi,
             'status' => 'dikirim',
-            'catatan' => ''
-        ]
-    );
-        return back()->with(    
+        ]);
+
+        return back()->with(
             'success',
             'Nomor resi berhasil disimpan.'
         );
     }
-    public function updateStatusKirim($id)
+   public function updateStatusKirim(Request $request, $id)
 {
-    Pengiriman::updateOrCreate(
-        [
-            'transaksi_id' => $id
-        ],
-        [
-            'kurir' => '',
-            'layanan' => '',
-            'ongkir' => 0,
-            'nomor_resi' => '',
-            'status' => 'dikirim',
-            'catatan' => ''
-        ]
-    );
+    $request->validate([
+        'status' => 'required|in:menunggu,diproses,dikemas,dikirim,selesai',
+    ]);
+
+    $pengiriman = Pengiriman::where('transaksi_id', $id)
+        ->firstOrFail();
+
+    $pengiriman->update([
+        'status' => $request->status,
+    ]);
 
     return back()->with(
         'success',
-        'Status pengiriman diperbarui.'
+        'Status pengiriman berhasil diperbarui.'
     );
 }
+
+
+// Cetak Label Pengiriman
+public function printLabel($id)
+{
+    $pengiriman = Pengiriman::with('pesanan')
+        ->findOrFail($id);
+
+    return view(
+        'kasir.label',
+        compact('pengiriman')
+    );
+}
+// Bukti Pembayaran
+public function buktiPembayaran($id)
+{
+    $transaksi = Transaksi::with('pembayaran')->findOrFail($id);
+
+    return view('kasir.buktipembayaran', compact('transaksi'));
 }
 
+
+// Foto Produk
+public function buktiProduk($id)
+{
+    $transaksi = Transaksi::with('pengiriman')->findOrFail($id);
+
+    return view('kasir.buktiproduk', compact('transaksi'));
+}
+
+}

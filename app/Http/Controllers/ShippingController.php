@@ -133,20 +133,4 @@ class ShippingController extends Controller
             compact('pengiriman')
         );
     }
-
-
-    /**
-     * Cetak label paket
-     */
-    public function printLabel($id)
-    {
-        $pengiriman = Pengiriman::with('pesanan')
-            ->findOrFail($id);
-
-
-        return view(
-            'admin.pengiriman.label',
-            compact('pengiriman')
-        );
-    }
 }

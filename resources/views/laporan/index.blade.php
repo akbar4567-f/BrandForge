@@ -71,7 +71,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->kode_transaksi }}</td>
-                    <td>{{ $item->user->name ?? '-' }}</td>
+                    <td>{{ $item->nama_penerima }}</td>
                     <td>{{ $item->tanggal_transaksi }}</td>
                     <td>Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
                     <td>Rp {{ number_format($item->bayar, 0, ',', '.') }}</td>
