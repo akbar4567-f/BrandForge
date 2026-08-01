@@ -1,4 +1,4 @@
-    <?php
+<?php
 
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\ShippingController;
@@ -14,6 +14,7 @@
     use App\Http\Controllers\StokController;
     use App\Http\Controllers\WebsiteController;
     use App\Http\Controllers\LaporanController;
+    use App\Http\Controllers\KoleksiController;
 
     // Halaman Awal
 
@@ -102,27 +103,34 @@
 
             Route::resource('admin/stok', StokController::class)
                 ->names('stok');
+
+            Route::resource('admin/koleksi', KoleksiController::class)
+                ->names('koleksi');
             
             // Pengiriman Admin
 
-            Route::get('/admin/pengiriman',[ShippingController::class, 'index'])
+            Route::get('/admin/pengiriman', [ShippingController::class, 'index'])
               ->name('admin.pengiriman.index');
 
-            Route::get('/admin/pengiriman/{id}/edit',[ShippingController::class, 'edit'])
+            Route::get('/admin/pengiriman/{id}/edit', [ShippingController::class, 'edit'])
               ->name('admin.pengiriman.edit');
 
 
-            Route::post('/admin/pengiriman/store',[ShippingController::class, 'store'])
+            Route::post('/admin/pengiriman/store', [ShippingController::class, 'store'])
                ->name('admin.pengiriman.store');
 
 
-            Route::put('/admin/pengiriman/{id}/status',[ShippingController::class, 'updateStatus'])
+            Route::put('/admin/pengiriman/{id}/status', [ShippingController::class, 'updateStatus'])
               ->name('admin.pengiriman.status');
 
 
-            Route::put('/admin/pengiriman/{id}/resi',[ShippingController::class, 'updateResi'])
+            Route::put('/admin/pengiriman/{id}/resi', [ShippingController::class, 'updateResi'])
                ->name('admin.pengiriman.resi');
 
+            Route::get('/admin/pengiriman/{id}/label', [ShippingController::class, 'printLabel'])
+               ->name('admin.pengiriman.label');
+
+            });
 
         // KASIR
 
@@ -208,10 +216,6 @@
             Route::get('/pelanggan/checkout', [PelangganController::class, 'checkout'])
                 ->name('pelanggan.checkout');
 
-            // Checkout Langsung
-            Route::get('/pelanggan/checkout/{id}', [PelangganController::class, 'checkoutLangsung'])
-                ->name('pelanggan.checkoutLangsung');
-
             // Proses Checkout
             Route::post('/pelanggan/checkout', [PelangganController::class, 'prosesCheckout'])
                 ->name('pelanggan.prosesCheckout');
@@ -239,19 +243,18 @@
                 ->name('pelanggan.riwayat');
 
             // Tracking Pengiriman
-           Route::get('/pelanggan/pesanan/{id}/tracking',[ShippingController::class,'tracking'])
+           Route::get('/pelanggan/pesanan/{id}/tracking', [ShippingController::class,'tracking'])
                  ->name('pelanggan.tracking');
 
-            Route::delete('/pelanggan/transaksi/{id}',[PelangganController::class, 'destroyTransaksi'])
+            Route::delete('/pelanggan/transaksi/{id}', [PelangganController::class, 'destroyTransaksi'])
                   ->name('pelanggan.destroyTransaksi');
 
             // Upload Foto Produk Setelah Barang Diterima
-            Route::post('/pelanggan/upload-foto-produk/{id}',[PelangganController::class,'uploadFotoProduk'])
+            Route::post('/pelanggan/upload-foto-produk/{id}', [PelangganController::class,'uploadFotoProduk'])
                 ->name('pelanggan.uploadFotoProduk');
 
         });
 
-        });
 
         // WEBSITE 
 

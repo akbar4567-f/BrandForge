@@ -13,28 +13,39 @@ class Produk extends Model
 
     protected $fillable = [
         'kategori_id',
+        'koleksi_id',
         'nama_produk',
         'deskripsi',
         'harga',
         'stok',
         'foto',
+        'foto2',
+        'foto3',
+        'foto4',
+        'foto5',
         'berat',
         'panjang',
         'lebar',
         'tinggi',
     ];
 
-        protected $casts = [
-        'berat' => 'integer',
+    protected $casts = [
+        'berat'   => 'integer',
         'panjang' => 'integer',
-        'lebar' => 'integer',
-        'tinggi' => 'integer',
+        'lebar'   => 'integer',
+        'tinggi'  => 'integer',
     ];
 
     // Relasi ke kategori
     public function kategori()
     {
         return $this->belongsTo(Kategori::class);
+    }
+
+    // Relasi ke koleksi
+    public function koleksi()
+    {
+        return $this->belongsTo(Koleksi::class);
     }
 
     // Relasi ke stok

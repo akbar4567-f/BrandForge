@@ -1,124 +1,196 @@
-    @extends('layouts.app')
+@extends('layouts.app')
 
-    @section('title', 'Dashboard Admin')
+@section('title', 'Dashboard Admin')
 
-    @section('content')
+@section('content')
 
-    <div class="container mt-4">
+<div class="container mt-4">
 
-        <h2 class="mb-3">Dashboard Admin</h2>
+    <h2 class="mb-2">Dashboard Admin</h2>
 
-        <p>Role Login: {{ auth()->user()->role }}</p>
-        
-        @if(auth()->user()->role == 'owner')
-            <a href="/owner" class="btn btn-primary">
-                Dashboard Owner
-            </a>
+    <p class="text-muted">
+        Selamat Datang,
+        <strong>{{ auth()->user()->name }}</strong>
+        ({{ ucfirst(auth()->user()->role) }})
+    </p>
+
+    @if(auth()->user()->role == 'owner')
+        <a href="{{ route('owner.index') }}" class="btn btn-primary mb-4">
+            Dashboard Owner
+        </a>
     @endif
 
-        <p>
-            Selamat Datang,
-            <b>{{ auth()->user()->name }}</b>
-        </p>
+            {{-- Notifikasi Stok Menipis --}}
+        @if($jumlahStokMenipis > 0)
 
-        <div class="row">
+        <div class="alert alert-warning shadow-sm">
 
-            <!-- KATEGORI -->
-            <div class="col-md-4 mb-4">
-                <div class="card card-menu bg-primary text-white">
-                    <div class="card-body text-center">
+            <h5 class="mb-3">
+                ⚠️ Notifikasi Stok Menipis
+                <span class="badge bg-danger">
+                    {{ $jumlahStokMenipis }}
+                </span>
+            </h5>
 
-                        <h1>📂</h1>
+            <table class="table table-bordered table-sm mb-0">
 
-                        <h4>Kategori</h4>
+                <thead class="table-light">
+                    <tr>
+                        <th>Produk</th>
+                        <th>Ukuran</th>
+                        <th>Warna</th>
+                        <th>Sisa Stok</th>
+                    </tr>
+                </thead>
 
-                        <p>Kelola data kategori produk.</p>
+                <tbody>
 
-                        <a href="{{ route('kategori.index') }}" class="btn btn-light">
-                            Kelola
-                        </a>
+                @foreach($stokMenipis as $stok)
 
-                    </div>
-                </div>
-            </div>
+                    <tr>
 
-            <!-- PRODUK -->
-            <div class="col-md-4 mb-4">
-                <div class="card card-menu bg-success text-white">
-                    <div class="card-body text-center">
+                        <td>{{ $stok->produk->nama_produk ?? '-' }}</td>
 
-                        <h1>📦</h1>
+                        <td>{{ $stok->ukuran->nama_ukuran ?? '-' }}</td>
 
-                        <h4>Produk</h4>
+                        <td>{{ $stok->warna->nama_warna ?? '-' }}</td>
 
-                        <p>Kelola data produk.</p>
+                        <td>
 
-                        <a href="{{ route('produk.index') }}" class="btn btn-light">
-                            Kelola
-                        </a>
+                            <span class="badge bg-danger">
+                                {{ $stok->jumlah }}
+                            </span>
 
-                    </div>
-                </div>
-            </div>
+                        </td>
 
-            <!-- UKURAN -->
-            <div class="col-md-4 mb-4">
-                <div class="card card-menu bg-warning">
-                    <div class="card-body text-center">
+                    </tr>
 
-                        <h1>📏</h1>
+                @endforeach
 
-                        <h4>Ukuran</h4>
+                </tbody>
 
-                        <p>Kelola data ukuran.</p>
-
-                        <a href="{{ route('ukuran.index') }}" class="btn btn-dark">
-                            Kelola
-                        </a>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- WARNA -->
-            <div class="col-md-4 mb-4">
-                <div class="card card-menu bg-danger text-white">
-                    <div class="card-body text-center">
-
-                        <h1>🎨</h1>
-
-                        <h4>Warna</h4>
-
-                        <p>Kelola data warna.</p>
-
-                        <a href="{{ route('warna.index') }}" class="btn btn-light">
-                            Kelola
-                        </a>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- STOK -->
-            <div class="col-md-4 mb-4">
-                <div class="card card-menu bg-dark text-white">
-                    <div class="card-body text-center">
-
-                        <h1>📦</h1>
-
-                        <h4>Stok</h4>
-
-                        <p>Kelola stok produk.</p>
-
-                        <a href="{{ route('stok.index') }}" class="btn btn-light">
-                            Kelola
-                        </a>
-
-                    </div>
-                </div>
-            </div>
+            </table>
 
         </div>
+
+        @endif
+
+    <div class="row">
+
+        <!-- Kategori -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-primary text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h1>📂</h1>
+                    <h4>Kategori</h4>
+                    <p>Kelola data kategori produk.</p>
+
+                    <a href="{{ route('kategori.index') }}"
+                       class="btn btn-light">
+                        Kelola
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Produk -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-success text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h1>📦</h1>
+                    <h4>Produk</h4>
+                    <p>Kelola data produk.</p>
+
+                    <a href="{{ route('produk.index') }}"
+                       class="btn btn-light">
+                        Kelola
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Koleksi -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-info text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h1>🛍️</h1>
+                    <h4>Koleksi</h4>
+                    <p>Kelola koleksi produk.</p>
+
+                    <a href="{{ route('koleksi.index') }}"
+                       class="btn btn-light">
+                        Kelola
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ukuran -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-warning shadow h-100">
+                <div class="card-body text-center">
+                    <h1>📏</h1>
+                    <h4>Ukuran</h4>
+                    <p>Kelola data ukuran.</p>
+
+                    <a href="{{ route('ukuran.index') }}"
+                       class="btn btn-dark">
+                        Kelola
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warna -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-danger text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h1>🎨</h1>
+                    <h4>Warna</h4>
+                    <p>Kelola data warna.</p>
+
+                    <a href="{{ route('warna.index') }}"
+                       class="btn btn-light">
+                        Kelola
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stok -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-dark text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h1>📦</h1>
+                    <h4>Stok</h4>
+                    <p>Kelola stok produk.</p>
+
+                    <a href="{{ route('stok.index') }}"
+                       class="btn btn-light">
+                        Kelola
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengiriman -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-secondary text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h1>🚚</h1>
+                    <h4>Pengiriman</h4>
+                    <p>Kelola pengiriman pesanan.</p>
+
+                    <a href="{{ route('admin.pengiriman.index') }}"
+                       class="btn btn-light">
+                        Kelola
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    @endsection
+</div>
+
+@endsection

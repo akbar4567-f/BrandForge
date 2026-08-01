@@ -22,7 +22,11 @@ return new class extends Migration
 
             $table->text('deskripsi')->nullable();
 
-            $table->string('foto')->nullable();
+            $table->string('foto')->nullable(); //foto utama
+            $table->string('foto2')->nullable();
+            $table->string('foto3')->nullable();
+            $table->string('foto4')->nullable();
+            $table->string('foto5')->nullable();
 
             $table->timestamps();
         });

@@ -32,7 +32,7 @@
             <div class="card bg-warning">
                 <div class="card-body">
                     <h5>Stok Hampir Habis</h5>
-                    <h2>8</h2>
+                    <h2>5</h2>
                 </div>
             </div>
         </div>

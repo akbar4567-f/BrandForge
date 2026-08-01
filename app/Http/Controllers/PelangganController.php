@@ -11,41 +11,176 @@
     use App\Models\Stok;
     use App\Models\Warna;
     use App\Models\Ukuran;
+    use App\Models\Koleksi;
+    use App\Models\Kategori;
     use Illuminate\Support\Str;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\DB;
 
     class PelangganController extends Controller
     {
-                // DASHBOARD BELANJA
-                public function dashboardBelanja()
-                {
-                    $jumlahKeranjang = Keranjang::where('user_id', Auth::id())->count();
+            // DASHBOARD BELANJA
+           public function dashboardBelanja()
+            {
+                $jumlahKeranjang = Keranjang::where('user_id', Auth::id())->count();
 
-                    return view('pelanggan.dashboard_belanja', compact('jumlahKeranjang'));
+                $totalProduk = Produk::count();
+
+                $totalPesanan = Transaksi::where('user_id', Auth::id())->count();
+
+                // Produk Terbaru
+                $produkTerbaru = Produk::with([
+                    'kategori',
+                    'koleksi',
+                    'stok'
+                ])
+                ->whereHas('stok', function ($q) {
+                    $q->where('jumlah', '>', 0);
+                })
+                ->latest()
+                ->take(8)
+                ->get();
+
+                // Produk Terlaris
+                $produkTerlaris = Produk::withSum('detailTransaksi', 'jumlah')
+                    ->orderByDesc('detail_transaksi_sum_jumlah')
+                    ->take(8)
+                    ->get();
+
+                // ⭐ Produk Rekomendasi
+                $produkRekomendasi = Produk::with([
+                    'kategori',
+                    'koleksi',
+                    'stok'
+                ])
+                ->withSum('detailTransaksi', 'jumlah')
+                ->whereHas('stok', function ($q) {
+                    $q->where('jumlah', '>', 0);
+                })
+                ->orderByDesc('detail_transaksi_sum_jumlah')
+                ->take(4)
+                ->get();
+
+                return view('pelanggan.dashboard_belanja', compact(
+                    'jumlahKeranjang',
+                    'totalProduk',
+                    'totalPesanan',
+                    'produkTerbaru',
+                    'produkTerlaris',
+                    'produkRekomendasi'
+                ));
+            }
+            // DAFTAR PRODUK
+            public function belanja(Request $request)
+            {
+                $query = Produk::with([
+                    'kategori',
+                    'koleksi',
+                    'stok.warna',
+                    'stok.ukuran'
+                ])
+                ->whereHas('stok', function ($q) {
+                    $q->where('jumlah', '>', 0);
+                });
+
+                // SEARCH
+                if ($request->filled('search')) {
+                    $query->where('nama_produk', 'like', '%' . $request->search . '%');
                 }
 
-                // DAFTAR PRODUK
-                public function belanja()
-                {
-                    $produks = Produk::with('stok')->get();
+                // FILTER HARGA
+                if ($request->filled('harga')) {
 
-                    return view('pelanggan.belanja', compact('produks'));
+                    switch ($request->harga) {
+
+                        case '1':
+                            $query->whereBetween('harga', [0, 100000]);
+                            break;
+
+                        case '2':
+                            $query->whereBetween('harga', [100001, 300000]);
+                            break;
+
+                        case '3':
+                            $query->where('harga', '>', 300000);
+                            break;
+                    }
                 }
 
+                // FILTER KATEGORI
+                if ($request->filled('kategori')) {
+
+                    $query->where('kategori_id', $request->kategori);
+
+                }
+                // FILTER WARNA
+                if ($request->filled('warna')) {
+
+                    $query->whereHas('stok', function ($q) use ($request) {
+
+                        $q->where('warna_id', $request->warna);
+
+                    });
+
+                }
+                // FILTER UKURAN
+                if ($request->filled('ukuran')) {
+
+                    $query->whereHas('stok', function ($q) use ($request) {
+
+                        $q->where('ukuran_id', $request->ukuran);
+
+                    });
+
+                }
+
+                $produks = $query->latest()->get();
+
+                return view('pelanggan.belanja', [
+
+                    'produks'   => $produks,
+                    'koleksis'  => Koleksi::all(),
+                    'kategoris' => Kategori::all(),
+                    'warnas'    => Warna::all(),
+                    'ukurans'   => Ukuran::all(),
+
+                ]);
+            }
                 // DETAIL PRODUK
-                public function detailProduk($id)
-                {
-                    $produk = Produk::with(['kategori', 'stok'])->findOrFail($id);
-                    $warna = Warna::all();
-                    $ukuran = Ukuran::all();
+               public function detailProduk($id)
+            {
+                $produk = Produk::with([
+                    'kategori',
+                    'koleksi',
+                    'stok.warna',
+                    'stok.ukuran'
+                ])->findOrFail($id);
 
-                    return view('pelanggan.detail_produk', compact(
-                        'produk',
-                        'warna',
-                        'ukuran'
-                    ));
-                }
+                $warna = Warna::all();
+                $ukuran = Ukuran::all();
+
+                // Produk Terkait
+                $produkTerkait = Produk::with([
+                        'kategori',
+                        'koleksi',
+                        'stok'
+                    ])
+                    ->where('kategori_id', $produk->kategori_id)
+                    ->where('id', '!=', $produk->id)
+                    ->whereHas('stok', function ($q) {
+                        $q->where('jumlah', '>', 0);
+                    })
+                    ->take(4)
+                    ->get();
+
+                return view('pelanggan.detail_produk', compact(
+                    'produk',
+                    'warna',
+                    'ukuran',
+                    'produkTerkait'
+                ));
+            }
             // Beli Sekarang
                 public function beliSekarang(Request $request, $id)
                 {
@@ -156,7 +291,8 @@
                 public function keranjang()
                     {
                         $keranjangs = Keranjang::with([
-                        'produk',
+                        'produk.kategori',
+                        'produk.koleksi',
                         'ukuran',
                         'warna'
                 ])
@@ -187,10 +323,11 @@
                 public function checkout()
                 {
                     $keranjangs = Keranjang::with([
-                        'produk',
-                        'ukuran',
-                        'warna'
-                    ])
+                    'produk.kategori',
+                    'produk.koleksi',
+                    'ukuran',
+                    'warna'
+                ])
                     ->where('user_id', Auth::id())
                     ->get();
 
@@ -206,7 +343,8 @@
                 public function prosesCheckout(Request $request)
                 {
                         $keranjang = Keranjang::with([
-                        'produk',
+                        'produk.kategori',
+                        'produk.koleksi',
                         'ukuran',
                         'warna'
                     ])
@@ -359,7 +497,10 @@
                     public function pembayaran($id)
                     {
                         $transaksi = Transaksi::where('user_id', Auth::id())
-                            ->with('detailTransaksi.produk')
+                           ->with([
+                            'detailTransaksi.produk.kategori',
+                            'detailTransaksi.produk.koleksi'
+                        ])
                             ->findOrFail($id);
                         $hargaProduk = 0;
 
@@ -402,7 +543,7 @@
                    $transaksi->update([
                     'bayar' => $transaksi->total_harga,
                     'kembalian' => 0,
-                    'status' => 'Diproses',
+                    'status' => 'Menunggu Verifikasi',
                 ]);
 
                     return redirect()->route('pelanggan.dashboardBelanja')
@@ -428,8 +569,8 @@
                         'foto_produk' => $namaFile,
                     ]);
 
-    return back()->with('success', 'Foto produk berhasil diupload.');
-}
+                return back()->with('success', 'Foto produk berhasil diupload.');
+            }
                 // DASHBOARD STATUS
                 public function index()
                 {
@@ -476,7 +617,8 @@
                 $transaksis = Transaksi::with([
                     'pengiriman',
                     'pembayaran',
-                    'detailTransaksi.produk'
+                    'detailTransaksi.produk.kategori',
+                    'detailTransaksi.produk.koleksi'
                 ])
 
                 ->where('user_id',Auth::id())

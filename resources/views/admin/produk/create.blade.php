@@ -17,12 +17,20 @@
 <div class="card shadow">
 
 <div class="card-header">
-
-<h3>Tambah Produk</h3>
-
+    <h3>Tambah Produk</h3>
 </div>
 
 <div class="card-body">
+
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul class="mb-0">
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 
 <form action="{{ route('produk.store') }}"
       method="POST"
@@ -30,25 +38,41 @@
 
 @csrf
 
-<div class="mb-3">
+<div class="row">
 
-<label>Kategori</label>
+    <div class="col-md-6 mb-3">
+        <label>Kategori</label>
 
-<select
-name="kategori_id"
-class="form-control">
+        <select name="kategori_id" class="form-control" required>
 
-@foreach($kategoris as $kategori)
+            <option value="">-- Pilih Kategori --</option>
 
-<option value="{{ $kategori->id }}">
+            @foreach($kategoris as $kategori)
+                <option value="{{ $kategori->id }}"
+                    {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>
+                    {{ $kategori->nama_kategori }}
+                </option>
+            @endforeach
 
-{{ $kategori->nama_kategori }}
+        </select>
+    </div>
 
-</option>
+    <div class="col-md-6 mb-3">
+        <label>Koleksi</label>
 
-@endforeach
+        <select name="koleksi_id" class="form-control">
 
-</select>
+            <option value="">-- Tidak Ada --</option>
+
+            @foreach($koleksis as $koleksi)
+                <option value="{{ $koleksi->id }}"
+                    {{ old('koleksi_id') == $koleksi->id ? 'selected' : '' }}>
+                    {{ $koleksi->nama_koleksi }}
+                </option>
+            @endforeach
+
+        </select>
+    </div>
 
 </div>
 
@@ -57,11 +81,12 @@ class="form-control">
 <label>Nama Produk</label>
 
 <input
-    type="text"
-    name="nama_produk"
-    class="form-control"
-    value="{{ old('nama_produk') }}"
-    required>
+type="text"
+name="nama_produk"
+class="form-control"
+value="{{ old('nama_produk') }}"
+required>
+
 </div>
 
 <div class="mb-3">
@@ -69,11 +94,11 @@ class="form-control">
 <label>Harga</label>
 
 <input
-    type="number"
-    name="harga"
-    class="form-control"
-    value="{{ old('harga') }}"
-    required>
+type="number"
+name="harga"
+class="form-control"
+value="{{ old('harga') }}"
+required>
 
 </div>
 
@@ -82,77 +107,122 @@ class="form-control">
 <label>Deskripsi</label>
 
 <textarea
-    name="deskripsi"
-    class="form-control">{{ old('deskripsi') }}</textarea>
+name="deskripsi"
+class="form-control"
+rows="4">{{ old('deskripsi') }}</textarea>
 
 </div>
+
 <div class="row">
 
     <div class="col-md-3 mb-3">
+
         <label>Berat (gram)</label>
-       <input
-            type="number"
-            name="berat"
-            class="form-control"
-            value="{{ old('berat',0) }}"
-            min="0"
-            required>
+
+        <input
+        type="number"
+        name="berat"
+        class="form-control"
+        value="{{ old('berat',0) }}"
+        min="0"
+        required>
+
     </div>
 
     <div class="col-md-3 mb-3">
+
         <label>Panjang (cm)</label>
-       <input
-            type="number"
-            name="panjang"
-            class="form-control"
-            value="{{ old('panjang',0) }}"
-            min="0"
-            required>
+
+        <input
+        type="number"
+        name="panjang"
+        class="form-control"
+        value="{{ old('panjang',0) }}"
+        min="0"
+        required>
+
     </div>
 
-    <div class="col-md-2 mb-3">
+    <div class="col-md-3 mb-3">
+
         <label>Lebar (cm)</label>
-       <input
-            type="number"
-            name="lebar"
-            class="form-control"
-            value="{{ old('lebar',0) }}"
-            min="0"
-            required>
+
+        <input
+        type="number"
+        name="lebar"
+        class="form-control"
+        value="{{ old('lebar',0) }}"
+        min="0"
+        required>
+
     </div>
 
-    <div class="col-md-2 mb-3">
+    <div class="col-md-3 mb-3">
+
         <label>Tinggi (cm)</label>
-       <input
-            type="number"
-            name="tinggi"
-            class="form-control"
-            value="{{ old('tinggi',0) }}"
-            min="0"
-            required>
+
+        <input
+        type="number"
+        name="tinggi"
+        class="form-control"
+        value="{{ old('tinggi',0) }}"
+        min="0"
+        required>
+
     </div>
 
 </div>
 
-<div class="mb-3">
+<div class="row">
 
-<label>Foto</label>
+    <div class="col-md-4 mb-3">
+        <label>Foto Utama</label>
+        <input
+        type="file"
+        name="foto"
+        class="form-control">
+    </div>
 
-<input
-type="file"
-name="foto"
-class="form-control">
+    <div class="col-md-4 mb-3">
+        <label>Foto 2</label>
+        <input
+        type="file"
+        name="foto2"
+        class="form-control">
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <label>Foto 3</label>
+        <input
+        type="file"
+        name="foto3"
+        class="form-control">
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label>Foto 4</label>
+        <input
+        type="file"
+        name="foto4"
+        class="form-control">
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label>Foto 5</label>
+        <input
+        type="file"
+        name="foto5"
+        class="form-control">
+    </div>
 
 </div>
 
 <button class="btn btn-success">
-
-Simpan
-
+    Simpan
 </button>
 
 <a href="{{ route('produk.index') }}"
-    class="btn btn-secondary">
+class="btn btn-secondary">
     Kembali
 </a>
 
@@ -165,5 +235,4 @@ Simpan
 </div>
 
 </body>
-
 </html>

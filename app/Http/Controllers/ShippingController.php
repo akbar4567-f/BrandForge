@@ -14,7 +14,7 @@ class ShippingController extends Controller
      */
     public function index()
     {
-        $pengiriman = Pengiriman::with('pesanan')
+        $pengiriman = Pengiriman::with('transaksi')
             ->latest()
             ->get();
 
@@ -28,12 +28,13 @@ class ShippingController extends Controller
     public function edit($id)
     {
         $transaksi = Transaksi::findOrFail($id);
-        $pengiriman = Pengiriman::where('pesanan_id', $id)
+
+        $pengiriman = Pengiriman::where('transaksi_id', $id)
             ->first();
 
         return view(
             'admin.pengiriman.edit',
-            compact('pesanan', 'pengiriman')
+            compact('transaksi', 'pengiriman')
         );
     }
 
@@ -41,37 +42,33 @@ class ShippingController extends Controller
     /**
      * Simpan data pengiriman
      */
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $request->validate([
-            'pesanan_id' => 'required',
-            'kurir' => 'required',
-            'layanan' => 'required',
-            'ongkir' => 'required|numeric',
-            'status' => 'required',
+            'transaksi_id' => 'required',
+            'kurir'        => 'required',
+            'layanan'      => 'required',
+            'ongkir'       => 'required|numeric',
         ]);
-
 
         Pengiriman::updateOrCreate(
             [
-                'pesanan_id' => $request->pesanan_id
+                'transaksi_id' => $request->transaksi_id
             ],
             [
-                'kurir' => $request->kurir,
-                'layanan' => $request->layanan,
-                'ongkir' => $request->ongkir,
-                'nomor_resi' => $request->nomor_resi,
-                'status' => $request->status,
-                'catatan' => $request->catatan,
+                'kurir'       => $request->kurir,
+                'layanan'     => $request->layanan,
+                'ongkir'      => $request->ongkir,
+                'nomor_resi'  => $request->nomor_resi,
+                'status'      => $request->status ?? 'menunggu',
+                'catatan'     => $request->catatan,
             ]
         );
-
 
         return redirect()
             ->route('admin.pengiriman.index')
             ->with('success', 'Data pengiriman berhasil disimpan');
     }
-
 
     /**
      * Update status pengiriman
@@ -121,16 +118,23 @@ class ShippingController extends Controller
     /**
      * Halaman tracking pelanggan
      */
-    public function tracking($id)
+   public function tracking($id)
     {
-        $pengiriman = Pengiriman::where('pesanan_id', $id)
-            ->with('pesanan')
+        $pengiriman = Pengiriman::where('transaksi_id', $id)
+            ->with('transaksi')
             ->firstOrFail();
 
-
-        return view(
-            'pelanggan.tracking',
-            compact('pengiriman')
-        );
+        return view('pelanggan.tracking', compact('pengiriman'));
     }
+
+    /**
+     * Cetak Label Pengiriman
+     */
+    public function printLabel($id)
+    {
+        $pengiriman = Pengiriman::with('transaksi')->findOrFail($id);
+
+        return view('admin.pengiriman.label', compact('pengiriman'));
+    }
+
 }

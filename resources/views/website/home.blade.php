@@ -35,53 +35,69 @@
             </p>
         </div>
 
-        <div class="row">
+       <div class="row">
 
-            @forelse($produks as $item)
+    @forelse($produks as $item)
 
-                <div class="col-md-3 mb-4">
+        <div class="col-md-3 mb-4">
 
-                    <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm">
 
-                        @if($item->gambar)
-                            <img src="{{ asset('storage/'.$item->gambar) }}"
-                                 class="card-img-top"
-                                 style="height:250px; object-fit:cover;">
-                        @else
-                            <img src="https://via.placeholder.com/300x250?text=BrandForge"
-                                 class="card-img-top">
-                        @endif
+                @if($item->foto)
+                    <img src="{{ asset('produk/'.$item->foto) }}"
+                         class="card-img-top"
+                         style="height:250px; object-fit:cover;">
+                @else
+                    <img src="https://via.placeholder.com/300x250?text=BrandForge"
+                         class="card-img-top"
+                         style="height:250px; object-fit:cover;">
+                @endif
 
-                        <div class="card-body">
+                <div class="card-body d-flex flex-column">
 
-                            <h5>{{ $item->nama_produk }}</h5>
+                    <h5 class="card-title">
+                        {{ $item->nama_produk }}
+                    </h5>
 
-                            <p class="text-primary fw-bold">
-                                Rp {{ number_format($item->harga,0,',','.') }}
-                            </p>
+                    @if($item->kategori)
+                        <small class="text-muted">
+                            {{ $item->kategori->nama_kategori }}
+                        </small>
+                    @endif
 
-                              <a href="{{ route('website.detail', $item->id) }}"
-                                class="btn btn-primary w-100">
-                                    Detail Produk
-                                </a>
+                    @if($item->koleksi)
+                        <small class="text-secondary">
+                            Koleksi :
+                            {{ $item->koleksi->nama_koleksi }}
+                        </small>
+                    @endif
 
-                        </div>
+                    <p class="text-primary fw-bold mt-2 mb-3">
+                        Rp {{ number_format($item->harga,0,',','.') }}
+                    </p>
 
-                    </div>
+                    <a href="{{ route('website.detail', $item->id) }}"
+                       class="btn btn-primary mt-auto">
+                        Detail Produk
+                    </a>
 
                 </div>
 
-            @empty
-
-                <div class="col-12">
-                    <div class="alert alert-info text-center">
-                        Belum ada produk.
-                    </div>
-                </div>
-
-            @endforelse
+            </div>
 
         </div>
+
+    @empty
+
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                Belum ada produk.
+            </div>
+        </div>
+
+    @endforelse
+
+</div>
 
         <div class="text-center mt-4">
 

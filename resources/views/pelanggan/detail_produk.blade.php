@@ -26,7 +26,7 @@
 
         <div class="col-md-7">
 
-            <h2>{{ $produk->nama }}</h2>
+         <h2>{{ $produk->nama_produk }}</h2>
 
             <h3 class="text-primary mb-3">
                 Rp {{ number_format($produk->harga,0,',','.') }}
@@ -114,6 +114,67 @@
             </form>
 
         </div>
+        <hr class="my-5">
+
+<h4 class="mb-4">
+    🛍️ Produk Terkait
+</h4>
+
+<div class="row">
+
+@forelse($produkTerkait as $item)
+
+<div class="col-md-3 mb-4">
+
+    <div class="card h-100 shadow-sm">
+
+        @if($item->foto)
+            <img src="{{ asset('storage/'.$item->foto) }}"
+                 class="card-img-top"
+                 style="height:220px;object-fit:cover;">
+        @else
+            <img src="https://via.placeholder.com/400x220?text=Produk"
+                 class="card-img-top"
+                 style="height:220px;object-fit:cover;">
+        @endif
+
+        <div class="card-body">
+
+            <h6>{{ $item->nama_produk }}</h6>
+
+            <p class="text-danger fw-bold">
+                Rp {{ number_format($item->harga,0,',','.') }}
+            </p>
+
+            <p class="small text-muted">
+                Stok :
+                {{ $item->stok->sum('jumlah') }}
+            </p>
+
+            <a href="{{ route('pelanggan.detailProduk', $item->id) }}"
+               class="btn btn-outline-primary btn-sm w-100">
+                Lihat Produk
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+@empty
+
+<div class="col-12">
+
+    <div class="alert alert-warning text-center">
+        Belum ada produk terkait.
+    </div>
+
+</div>
+
+@endforelse
+
+</div>
 
     </div>
 

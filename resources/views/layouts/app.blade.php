@@ -177,6 +177,10 @@
                     <i class="bi bi-box-seam"></i> Produk
                 </a>
 
+                <a href="{{ route('koleksi.index') }}">
+                    <i class="bi bi-collection"></i> Koleksi
+                </a>
+
                 <a href="{{ route('stok.index') }}">
                     <i class="bi bi-archive"></i> Stok
                 </a>
