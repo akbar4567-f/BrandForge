@@ -1,132 +1,153 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Data Stok</title>
+@extends('layouts.app')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+@section('title', 'Data Stok')
 
-    <style>
-        body{
-            background:#f4f6f9;
-        }
+@section('content')
 
-        .container{
-            margin-top:40px;
-        }
+<div class="container-fluid py-4">
 
-        .card{
-            border:none;
-            border-radius:15px;
-            box-shadow:0 5px 15px rgba(0,0,0,.1);
-        }
-
-        .btn{
-            border-radius:8px;
-        }
-
-        table{
-            vertical-align:middle;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-
-    <div class="card">
-
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-
-            <h4 class="mb-0">📦 Data Stok</h4>
-
-            <a href="{{ route('stok.create') }}" class="btn btn-light">
-                + Tambah Stok
-            </a>
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">📦 Data Stok</h3>
+            <p class="text-muted mb-0">
+                Kelola stok produk berdasarkan ukuran dan warna.
+            </p>
         </div>
+
+        <a href="{{ route('stok.create') }}" class="btn btn-primary">
+            + Tambah Stok
+        </a>
+    </div>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show">
+            {{ session('success') }}
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    @endif
+
+    <div class="card border-0 shadow-sm">
 
         <div class="card-body">
 
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
+            <div class="table-responsive">
 
-            <table class="table table-bordered table-hover">
+                <table class="table table-hover align-middle mb-0">
 
-                <thead class="table-dark">
-                    <tr>
-                        <th>No</th>
-                        <th>Produk</th>
-                        <th>Ukuran</th>
-                        <th>Warna</th>
-                        <th>Jumlah</th>
-                        <th width="220">Aksi</th>
-                    </tr>
-                </thead>
+                    <thead class="table-dark">
 
-                <tbody>
+                        <tr>
+                            <th>No</th>
+                            <th>Produk</th>
+                            <th>Ukuran</th>
+                            <th>Warna</th>
+                            <th>Jumlah</th>
+                            <th width="180">Aksi</th>
+                        </tr>
 
-                @forelse($stoks as $stok)
+                    </thead>
 
-                    <tr>
+                    <tbody>
 
-                        <td>{{ $loop->iteration }}</td>
+                    @forelse($stoks as $stok)
 
-                        <td>{{ $stok->produk->nama_produk }}</td>
+                        <tr>
 
-                        <td>{{ $stok->ukuran->nama_ukuran }}</td>
+                            <td>
+                                {{ $loop->iteration }}
+                            </td>
 
-                        <td>{{ $stok->warna->nama_warna }}</td>
+                            <td>
+                                <strong>
+                                    {{ $stok->produk->nama_produk ?? '-' }}
+                                </strong>
+                            </td>
 
-                        <td>{{ $stok->jumlah }}</td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    {{ $stok->ukuran->nama_ukuran ?? '-' }}
+                                </span>
+                            </td>
 
-                        <td>
+                            <td>
+                                {{ $stok->warna->nama_warna ?? '-' }}
+                            </td>
 
-                            <a href="{{ route('stok.edit',$stok->id) }}"
-                               class="btn btn-warning btn-sm">
-                                Edit
-                            </a>
+                            <td>
 
-                            <form action="{{ route('stok.destroy',$stok->id) }}"
-                                  method="POST"
-                                  class="d-inline">
+                                @if($stok->jumlah <= 5)
 
-                                @csrf
-                                @method('DELETE')
+                                    <span class="badge bg-danger">
+                                        {{ $stok->jumlah }} — Menipis
+                                    </span>
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Yakin ingin menghapus data stok ini?')">
-                                    Hapus
-                                </button>
+                                @else
 
-                            </form>
+                                    <span class="badge bg-success">
+                                        {{ $stok->jumlah }}
+                                    </span>
 
-                        </td>
+                                @endif
 
-                    </tr>
+                            </td>
 
-                @empty
+                            <td>
 
-                    <tr>
-                        <td colspan="6" class="text-center">
-                            Belum ada data stok.
-                        </td>
-                    </tr>
+                                <a href="{{ route('stok.edit', $stok->id) }}"
+                                   class="btn btn-warning btn-sm">
+                                    Edit
+                                </a>
 
-                @endforelse
+                                <form
+                                    action="{{ route('stok.destroy', $stok->id) }}"
+                                    method="POST"
+                                    class="d-inline">
 
-                </tbody>
+                                    @csrf
+                                    @method('DELETE')
 
-            </table>
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Yakin ingin menghapus stok ini?')">
 
-            <a href="/admin" class="btn btn-secondary">
-                ← Kembali ke Dashboard Admin
-            </a>
+                                        Hapus
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                    @empty
+
+                        <tr>
+
+                            <td colspan="6"
+                                class="text-center text-muted py-4">
+
+                                📦 Belum ada data stok.
+
+                            </td>
+
+                        </tr>
+
+                    @endforelse
+
+                    </tbody>
+
+                </table>
+                <a href="{{ route('admin.index') }}" class="btn btn-secondary mt-3">
+                    ← Kembali ke Dashboard Admin
+                </a>
+
+            </div>
 
         </div>
 
@@ -134,5 +155,4 @@
 
 </div>
 
-</body>
-</html>
+@endsection

@@ -7,11 +7,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Stok extends Model
 {
+    use HasFactory;
+
+    protected $table = 'stoks';
+
     protected $fillable = [
         'produk_id',
         'ukuran_id',
         'warna_id',
         'jumlah',
+    ];
+
+    protected $casts = [
+        'jumlah' => 'integer',
     ];
 
     // Relasi ke Produk

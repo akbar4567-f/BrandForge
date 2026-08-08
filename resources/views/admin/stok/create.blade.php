@@ -1,112 +1,193 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Stok</title>
+@extends('layouts.app')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+@section('title', 'Tambah Stok')
 
-    <style>
-        body{
-            background:#f4f6f9;
-        }
+@section('content')
 
-        .container{
-            margin-top:40px;
-            max-width:700px;
-        }
+<div class="container-fluid py-4">
 
-        .card{
-            border:none;
-            border-radius:15px;
-            box-shadow:0 5px 15px rgba(0,0,0,.1);
-        }
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-        .btn{
-            border-radius:8px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-
-    <div class="card">
-
-        <div class="card-header bg-dark text-white">
-            <h4 class="mb-0">📦 Tambah Stok</h4>
+        <div>
+            <h3 class="fw-bold mb-1">📦 Tambah Stok</h3>
+            <p class="text-muted mb-0">
+                Tambahkan stok berdasarkan produk, ukuran, dan warna.
+            </p>
         </div>
+
+        <a href="{{ route('stok.index') }}"
+           class="btn btn-secondary">
+
+            ← Kembali
+
+        </a>
+
+    </div>
+
+    @if ($errors->any())
+
+        <div class="alert alert-danger">
+
+            <strong>Terjadi kesalahan:</strong>
+
+            <ul class="mb-0 mt-2">
+
+                @foreach ($errors->all() as $error)
+
+                    <li>{{ $error }}</li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+    <div class="card border-0 shadow-sm">
 
         <div class="card-body">
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form action="{{ route('stok.store') }}" method="POST">
+            <form action="{{ route('stok.store') }}"
+                  method="POST">
 
                 @csrf
 
+                {{-- PRODUK --}}
                 <div class="mb-3">
-                    <label class="form-label">Produk</label>
-                    <select name="produk_id" class="form-select" required>
-                        <option value="">-- Pilih Produk --</option>
+
+                    <label class="form-label fw-semibold">
+                        Produk
+                    </label>
+
+                    <select
+                        name="produk_id"
+                        class="form-select"
+                        required>
+
+                        <option value="">
+                            -- Pilih Produk --
+                        </option>
+
                         @foreach($produks as $produk)
-                            <option value="{{ $produk->id }}" {{ old('produk_id') == $produk->id ? 'selected' : '' }}>
+
+                            <option
+                                value="{{ $produk->id }}"
+                                {{ old('produk_id') == $produk->id ? 'selected' : '' }}>
+
                                 {{ $produk->nama_produk }}
+
                             </option>
+
                         @endforeach
+
                     </select>
+
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Ukuran</label>
-                    <select name="ukuran_id" class="form-select" required>
-                        <option value="">-- Pilih Ukuran --</option>
-                        @foreach($ukurans as $ukuran)
-                            <option value="{{ $ukuran->id }}" {{ old('ukuran_id') == $ukuran->id ? 'selected' : '' }}>
-                                {{ $ukuran->nama_ukuran }}
+                <div class="row">
+
+                    {{-- UKURAN --}}
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Ukuran
+                        </label>
+
+                        <select
+                            name="ukuran_id"
+                            class="form-select"
+                            required>
+
+                            <option value="">
+                                -- Pilih Ukuran --
                             </option>
-                        @endforeach
-                    </select>
+
+                            @foreach($ukurans as $ukuran)
+
+                                <option
+                                    value="{{ $ukuran->id }}"
+                                    {{ old('ukuran_id') == $ukuran->id ? 'selected' : '' }}>
+
+                                    {{ $ukuran->nama_ukuran }}
+
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+                    {{-- WARNA --}}
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Warna
+                        </label>
+
+                        <select
+                            name="warna_id"
+                            class="form-select"
+                            required>
+
+                            <option value="">
+                                -- Pilih Warna --
+                            </option>
+
+                            @foreach($warnas as $warna)
+
+                                <option
+                                    value="{{ $warna->id }}"
+                                    {{ old('warna_id') == $warna->id ? 'selected' : '' }}>
+
+                                    {{ $warna->nama_warna }}
+
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Warna</label>
-                    <select name="warna_id" class="form-select" required>
-                        <option value="">-- Pilih Warna --</option>
-                        @foreach($warnas as $warna)
-                            <option value="{{ $warna->id }}" {{ old('warna_id') == $warna->id ? 'selected' : '' }}>
-                                {{ $warna->nama_warna }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                {{-- JUMLAH --}}
+                <div class="mb-4">
 
-                <div class="mb-3">
-                    <label class="form-label">Jumlah Stok</label>
+                    <label class="form-label fw-semibold">
+                        Jumlah Stok
+                    </label>
+
                     <input
                         type="number"
                         name="jumlah"
                         class="form-control"
-                        value="{{ old('jumlah') }}"
+                        value="{{ old('jumlah', 0) }}"
                         min="0"
                         required>
+
                 </div>
 
-                <button type="submit" class="btn btn-success">
-                    Simpan
-                </button>
+                <div class="d-flex justify-content-end gap-2">
 
-                <a href="{{ route('stok.index') }}" class="btn btn-secondary">
-                    Batal
-                </a>
+                    <a href="{{ route('stok.index') }}"
+                       class="btn btn-secondary">
+
+                        Batal
+
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success">
+
+                        💾 Simpan Stok
+
+                    </button>
+
+                </div>
 
             </form>
 
@@ -116,5 +197,4 @@
 
 </div>
 
-</body>
-</html>
+@endsection

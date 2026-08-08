@@ -10,24 +10,26 @@ use Illuminate\Http\Request;
 
 class StokController extends Controller
 {
-    /**
-     * Tampilkan semua data stok.
-     */
+    // Menampilkan semua data stok
     public function index()
     {
-        $stoks = Stok::with(['produk', 'ukuran', 'warna'])->get();
+        $stoks = Stok::with([
+            'produk',
+            'ukuran',
+            'warna'
+        ])
+        ->latest()
+        ->get();
 
         return view('admin.stok.index', compact('stoks'));
     }
 
-    /**
-     * Form tambah stok.
-     */
+    // Form tambah stok
     public function create()
     {
         $produks = Produk::orderBy('nama_produk')->get();
         $ukurans = Ukuran::orderBy('nama_ukuran')->get();
-        $warnas  = Warna::orderBy('nama_warna')->get();
+        $warnas = Warna::orderBy('nama_warna')->get();
 
         return view('admin.stok.create', compact(
             'produks',
@@ -36,46 +38,64 @@ class StokController extends Controller
         ));
     }
 
-    /**
-     * Simpan data stok.
-     */
+    // Menyimpan stok baru
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'produk_id' => 'required|exists:produks,id',
             'ukuran_id' => 'required|exists:ukurans,id',
-            'warna_id'  => 'required|exists:warnas,id',
-            'jumlah'    => 'required|integer|min:0',
+            'warna_id' => 'required|exists:warnas,id',
+            'jumlah' => 'required|integer|min:0',
         ]);
 
-        Stok::create([
-            'produk_id' => $request->produk_id,
-            'ukuran_id' => $request->ukuran_id,
-            'warna_id'  => $request->warna_id,
-            'jumlah'    => $request->jumlah,
-        ]);
+        // Cek apakah kombinasi produk + ukuran + warna sudah ada
+        $stok = Stok::where('produk_id', $validated['produk_id'])
+            ->where('ukuran_id', $validated['ukuran_id'])
+            ->where('warna_id', $validated['warna_id'])
+            ->first();
+
+        if ($stok) {
+
+            // Jika sudah ada, jumlah stok ditambahkan
+            $stok->increment('jumlah', $validated['jumlah']);
+
+            return redirect()
+                ->route('stok.index')
+                ->with(
+                    'success',
+                    'Stok sudah ada. Jumlah stok berhasil ditambahkan.'
+                );
+        }
+
+        // Jika belum ada, buat stok baru
+        Stok::create($validated);
 
         return redirect()
             ->route('stok.index')
-            ->with('success', 'Data stok berhasil ditambahkan.');
+            ->with(
+                'success',
+                'Data stok berhasil ditambahkan.'
+            );
     }
 
-    /**
-     * Detail stok.
-     */
+    // Menampilkan detail stok
     public function show(Stok $stok)
     {
-        return redirect()->route('stok.index');
+        $stok->load([
+            'produk',
+            'ukuran',
+            'warna'
+        ]);
+
+        return view('admin.stok.show', compact('stok'));
     }
 
-    /**
-     * Form edit stok.
-     */
+    // Form edit stok
     public function edit(Stok $stok)
     {
         $produks = Produk::orderBy('nama_produk')->get();
         $ukurans = Ukuran::orderBy('nama_ukuran')->get();
-        $warnas  = Warna::orderBy('nama_warna')->get();
+        $warnas = Warna::orderBy('nama_warna')->get();
 
         return view('admin.stok.edit', compact(
             'stok',
@@ -85,39 +105,52 @@ class StokController extends Controller
         ));
     }
 
-    /**
-     * Update data stok.
-     */
+    // Update stok
     public function update(Request $request, Stok $stok)
     {
-        $request->validate([
+        $validated = $request->validate([
             'produk_id' => 'required|exists:produks,id',
             'ukuran_id' => 'required|exists:ukurans,id',
-            'warna_id'  => 'required|exists:warnas,id',
-            'jumlah'    => 'required|integer|min:0',
+            'warna_id' => 'required|exists:warnas,id',
+            'jumlah' => 'required|integer|min:0',
         ]);
 
-        $stok->update([
-            'produk_id' => $request->produk_id,
-            'ukuran_id' => $request->ukuran_id,
-            'warna_id'  => $request->warna_id,
-            'jumlah'    => $request->jumlah,
-        ]);
+        // Cek apakah kombinasi tersebut sudah dipakai stok lain
+        $stokLain = Stok::where('produk_id', $validated['produk_id'])
+            ->where('ukuran_id', $validated['ukuran_id'])
+            ->where('warna_id', $validated['warna_id'])
+            ->where('id', '!=', $stok->id)
+            ->first();
+
+        if ($stokLain) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'produk_id' =>
+                        'Stok dengan produk, ukuran, dan warna tersebut sudah ada.'
+                ]);
+        }
+
+        $stok->update($validated);
 
         return redirect()
             ->route('stok.index')
-            ->with('success', 'Data stok berhasil diperbarui.');
+            ->with(
+                'success',
+                'Data stok berhasil diperbarui.'
+            );
     }
 
-    /**
-     * Hapus data stok.
-     */
+    // Hapus stok
     public function destroy(Stok $stok)
     {
         $stok->delete();
 
         return redirect()
             ->route('stok.index')
-            ->with('success', 'Data stok berhasil dihapus.');
+            ->with(
+                'success',
+                'Data stok berhasil dihapus.'
+            );
     }
 }

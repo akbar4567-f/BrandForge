@@ -17,12 +17,9 @@ class Produk extends Model
         'nama_produk',
         'deskripsi',
         'harga',
+        'modal_produk',
         'stok',
         'foto',
-        'foto2',
-        'foto3',
-        'foto4',
-        'foto5',
         'berat',
         'panjang',
         'lebar',
@@ -30,37 +27,39 @@ class Produk extends Model
     ];
 
     protected $casts = [
-        'berat'   => 'integer',
+        'harga' => 'decimal:2',
+        'modal_produk' => 'decimal:2',
+        'berat' => 'integer',
         'panjang' => 'integer',
-        'lebar'   => 'integer',
-        'tinggi'  => 'integer',
+        'lebar' => 'integer',
+        'tinggi' => 'integer',
     ];
 
-    // Relasi ke kategori
     public function kategori()
     {
         return $this->belongsTo(Kategori::class);
     }
 
-    // Relasi ke koleksi
     public function koleksi()
     {
         return $this->belongsTo(Koleksi::class);
     }
 
-    // Relasi ke stok
+    public function fotos()
+    {
+        return $this->hasMany(ProdukFoto::class, 'produk_id');
+    }
+
     public function stok()
     {
         return $this->hasMany(Stok::class);
     }
 
-    // Relasi ke detail transaksi
     public function detailTransaksi()
     {
         return $this->hasMany(DetailTransaksi::class);
     }
 
-    // Relasi ke keranjang
     public function keranjang()
     {
         return $this->hasMany(Keranjang::class);

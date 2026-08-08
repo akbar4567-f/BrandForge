@@ -12,8 +12,12 @@
     use App\Http\Controllers\UkuranController;
     use App\Http\Controllers\WarnaController;
     use App\Http\Controllers\StokController;
+    use App\Http\Controllers\SupplierController;
+    use App\Http\Controllers\PembelianController;
+    use App\Http\Controllers\ReturController;
     use App\Http\Controllers\WebsiteController;
     use App\Http\Controllers\LaporanController;
+    use App\Http\Controllers\BiayaOperasionalController;
     use App\Http\Controllers\KoleksiController;
 
     // Halaman Awal
@@ -80,57 +84,79 @@
             Route::get('/owner/laporan/pdf', [LaporanController::class, 'pdf'])
                 ->name('laporan.pdf');
 
+            Route::get('/owner/laporan/excel', [LaporanController::class, 'excel'])
+                ->name('laporan.excel');
+
+            Route::resource('/owner/biaya-operasional', BiayaOperasionalController::class
+                    )->names('biaya-operasional');
+
         });
 
-        // ADMIN
+      // ADMIN
 
         Route::middleware('role:owner,admin')->group(function () {
 
             Route::get('/admin', [AdminController::class, 'index'])
                 ->name('admin.index');
 
+            // Kategori
             Route::resource('admin/kategori', KategoriController::class)
                 ->names('kategori');
 
+            // Produk
             Route::resource('admin/produk', ProdukController::class)
                 ->names('produk');
 
+            // Ukuran
             Route::resource('admin/ukuran', UkuranController::class)
                 ->names('ukuran');
 
+            // Warna
             Route::resource('admin/warna', WarnaController::class)
                 ->names('warna');
 
+            // Koleksi
+            Route::resource('admin/koleksi', KoleksiController::class)
+                ->names('koleksi');
+                
+            // Supplier
+            Route::resource('admin/supplier', SupplierController::class)
+                ->names('supplier');
+
+            // Pembelian Stok
+            Route::resource('admin/pembelian', PembelianController::class)
+                ->names('pembelian');
+
+            // Retur Barang
+            Route::resource('admin/retur', ReturController::class)
+                ->names('retur');
+
+            // Manajemen Stok
             Route::resource('admin/stok', StokController::class)
                 ->names('stok');
 
-            Route::resource('admin/koleksi', KoleksiController::class)
-                ->names('koleksi');
-            
-            // Pengiriman Admin
+
+            // PENGIRIMAN ADMIN
 
             Route::get('/admin/pengiriman', [ShippingController::class, 'index'])
-              ->name('admin.pengiriman.index');
+                ->name('admin.pengiriman.index');
 
             Route::get('/admin/pengiriman/{id}/edit', [ShippingController::class, 'edit'])
-              ->name('admin.pengiriman.edit');
-
+                ->name('admin.pengiriman.edit');
 
             Route::post('/admin/pengiriman/store', [ShippingController::class, 'store'])
-               ->name('admin.pengiriman.store');
-
+                ->name('admin.pengiriman.store');
 
             Route::put('/admin/pengiriman/{id}/status', [ShippingController::class, 'updateStatus'])
-              ->name('admin.pengiriman.status');
-
+                ->name('admin.pengiriman.status');
 
             Route::put('/admin/pengiriman/{id}/resi', [ShippingController::class, 'updateResi'])
-               ->name('admin.pengiriman.resi');
+                ->name('admin.pengiriman.resi');
 
             Route::get('/admin/pengiriman/{id}/label', [ShippingController::class, 'printLabel'])
-               ->name('admin.pengiriman.label');
+                ->name('admin.pengiriman.label');
 
-            });
+        });
 
         // KASIR
 
@@ -172,10 +198,10 @@
             Route::get('/kasir/pengiriman/{id}/label',[KasirController::class, 'printLabel'])
                ->name('kasir.pengiriman.label');
 
-         Route::get('/kasir/transaksi/{id}/bukti', [KasirController::class, 'buktiPembayaran'])
+            Route::get('/kasir/transaksi/{id}/bukti', [KasirController::class, 'buktiPembayaran'])
             ->name('kasir.buktiPembayaran');
 
-        Route::get('/kasir/transaksi/{id}/produk', [KasirController::class, 'buktiProduk'])
+            Route::get('/kasir/transaksi/{id}/produk', [KasirController::class, 'buktiProduk'])
             ->name('kasir.buktiProduk');
         });
 

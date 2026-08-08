@@ -1,33 +1,41 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Produk</title>
+@extends('layouts.app')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+@section('title', 'Edit Produk')
 
-<body class="bg-light">
+@section('content')
 
-<div class="container mt-5">
+<div class="container py-4">
 
-    <div class="card shadow">
-
-        <div class="card-header bg-warning">
-            <h3>✏️ Edit Produk</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Edit Produk</h3>
+            <small class="text-muted">
+                Ubah informasi dan foto produk
+            </small>
         </div>
 
-        <div class="card-body">
+        <a href="{{ route('produk.index') }}" class="btn btn-secondary">
+            ← Kembali
+        </a>
+    </div>
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+    {{-- Error --}}
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>Terjadi kesalahan:</strong>
+
+            <ul class="mb-0 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    {{-- Form --}}
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
 
             <form action="{{ route('produk.update', $produk->id) }}"
                   method="POST"
@@ -35,14 +43,25 @@
 
                 @csrf
                 @method('PUT')
+                
+                {{-- INFORMASI PRODUK --}}
+
+                <h5 class="fw-bold mb-3">
+                    Informasi Produk
+                </h5>
 
                 <div class="row">
 
+                    {{-- Kategori --}}
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">Kategori</label>
+                        <label class="form-label fw-semibold">
+                            Kategori
+                        </label>
 
-                        <select name="kategori_id" class="form-control" required>
+                        <select name="kategori_id"
+                                class="form-select"
+                                required>
 
                             @foreach($kategoris as $kategori)
 
@@ -59,13 +78,20 @@
 
                     </div>
 
+
+                    {{-- Koleksi --}}
                     <div class="col-md-6 mb-3">
 
-                        <label class="form-label">Koleksi</label>
+                        <label class="form-label fw-semibold">
+                            Koleksi
+                        </label>
 
-                        <select name="koleksi_id" class="form-control">
+                        <select name="koleksi_id"
+                                class="form-select">
 
-                            <option value="">-- Tidak Ada --</option>
+                            <option value="">
+                                Tidak Ada
+                            </option>
 
                             @foreach($koleksis as $koleksi)
 
@@ -84,155 +110,273 @@
 
                 </div>
 
+
+                {{-- Nama Produk --}}
                 <div class="mb-3">
 
-                    <label>Nama Produk</label>
+                    <label class="form-label fw-semibold">
+                        Nama Produk
+                    </label>
 
-                    <input
-                        type="text"
-                        name="nama_produk"
-                        class="form-control"
-                        value="{{ old('nama_produk', $produk->nama_produk) }}"
-                        required>
+                    <input type="text"
+                           name="nama_produk"
+                           class="form-control"
+                           value="{{ old('nama_produk', $produk->nama_produk) }}"
+                           required>
 
                 </div>
 
-                <div class="mb-3">
 
-                    <label>Harga</label>
-
-                    <input
-                        type="number"
-                        name="harga"
-                        class="form-control"
-                        value="{{ old('harga', $produk->harga) }}"
-                        required>
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label>Deskripsi</label>
-
-                    <textarea
-                        name="deskripsi"
-                        class="form-control"
-                        rows="4">{{ old('deskripsi', $produk->deskripsi) }}</textarea>
-
-                </div>
-
+                {{-- Harga --}}
                 <div class="row">
 
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-6 mb-3">
 
-                        <label>Berat (gram)</label>
+                        <label class="form-label fw-semibold">
+                            Harga Jual
+                        </label>
 
-                        <input
-                            type="number"
-                            name="berat"
-                            class="form-control"
-                            value="{{ old('berat', $produk->berat) }}"
-                            required>
-
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-
-                        <label>Panjang (cm)</label>
-
-                        <input
-                            type="number"
-                            name="panjang"
-                            class="form-control"
-                            value="{{ old('panjang', $produk->panjang) }}"
-                            required>
+                        <input type="number"
+                               name="harga"
+                               class="form-control"
+                               value="{{ old('harga', $produk->harga) }}"
+                               required>
 
                     </div>
 
-                    <div class="col-md-3 mb-3">
 
-                        <label>Lebar (cm)</label>
+                    <div class="col-md-6 mb-3">
 
-                        <input
-                            type="number"
-                            name="lebar"
-                            class="form-control"
-                            value="{{ old('lebar', $produk->lebar) }}"
-                            required>
+                        <label class="form-label fw-semibold">
+                            Modal Produk
+                        </label>
 
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-
-                        <label>Tinggi (cm)</label>
-
-                        <input
-                            type="number"
-                            name="tinggi"
-                            class="form-control"
-                            value="{{ old('tinggi', $produk->tinggi) }}"
-                            required>
+                        <input type="number"
+                               name="modal_produk"
+                               class="form-control"
+                               value="{{ old('modal_produk', $produk->modal_produk) }}"
+                               required>
 
                     </div>
 
                 </div>
+
+
+                {{-- Deskripsi --}}
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Deskripsi
+                    </label>
+
+                    <textarea name="deskripsi"
+                              rows="4"
+                              class="form-control">{{ old('deskripsi', $produk->deskripsi) }}</textarea>
+
+                </div>
+
 
                 <hr>
 
-                <h5>Foto Produk</h5>
+                {{-- DIMENSI --}}
+
+                <h5 class="fw-bold mb-3">
+                    Dimensi Produk
+                </h5>
 
                 <div class="row">
 
-                    @for($i=1;$i<=5;$i++)
+                    <div class="col-md-3 mb-3">
 
-                        @php
-                            $field = $i == 1 ? 'foto' : 'foto'.$i;
-                        @endphp
+                        <label class="form-label">
+                            Berat (gram)
+                        </label>
 
-                        <div class="col-md-4 mb-4">
+                        <input type="number"
+                               name="berat"
+                               class="form-control"
+                               value="{{ old('berat', $produk->berat) }}"
+                               required>
 
-                            <label class="form-label">
+                    </div>
 
-                                {{ $i==1 ? 'Foto Utama' : 'Foto '.$i }}
 
-                            </label>
+                    <div class="col-md-3 mb-3">
 
-                            <br>
+                        <label class="form-label">
+                            Panjang (cm)
+                        </label>
 
-                            @if($produk->$field)
+                        <input type="number"
+                               name="panjang"
+                               class="form-control"
+                               value="{{ old('panjang', $produk->panjang) }}"
+                               required>
 
-                                <img
-                                    src="{{ asset('produk/'.$produk->$field) }}"
-                                    class="img-thumbnail mb-2"
-                                    style="height:150px;object-fit:cover;">
+                    </div>
 
-                            @else
 
-                                <div class="text-muted mb-2">
-                                    Belum ada foto
-                                </div>
+                    <div class="col-md-3 mb-3">
 
-                            @endif
+                        <label class="form-label">
+                            Lebar (cm)
+                        </label>
 
-                            <input
-                                type="file"
-                                name="{{ $field }}"
-                                class="form-control">
+                        <input type="number"
+                               name="lebar"
+                               class="form-control"
+                               value="{{ old('lebar', $produk->lebar) }}"
+                               required>
 
-                        </div>
+                    </div>
 
-                    @endfor
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">
+                            Tinggi (cm)
+                        </label>
+
+                        <input type="number"
+                               name="tinggi"
+                               class="form-control"
+                               value="{{ old('tinggi', $produk->tinggi) }}"
+                               required>
+
+                    </div>
 
                 </div>
 
-                <button class="btn btn-success">
-                    💾 Update Produk
-                </button>
 
-                <a href="{{ route('produk.index') }}"
-                   class="btn btn-secondary">
-                    Kembali
-                </a>
+                <hr>
+
+
+                {{-- FOTO PRODUK --}}
+
+                <h5 class="fw-bold mb-3">
+                    Foto Produk
+                </h5>
+
+                <p class="text-muted small">
+                    Foto utama disimpan pada produk. Foto tambahan disimpan sebagai
+                    multi foto pada tabel <strong>produk_fotos</strong>.
+                </p>
+
+
+                {{-- FOTO UTAMA --}}
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Foto Utama
+                    </label>
+
+                    <div class="mb-2">
+
+                        @if($produk->foto)
+
+                            <img src="{{ asset('produk/' . $produk->foto) }}"
+                                 class="img-thumbnail"
+                                 style="width:220px;height:220px;object-fit:cover;">
+
+                        @else
+
+                            <div class="border rounded d-flex align-items-center justify-content-center"
+                                 style="width:220px;height:220px;background:#f8f9fa;">
+
+                                <span class="text-muted">
+                                    Belum ada foto
+                                </span>
+
+                            </div>
+
+                        @endif
+
+                    </div>
+
+                    <input type="file"
+                           name="foto"
+                           class="form-control"
+                           accept="image/*">
+
+                </div>
+
+
+                {{-- FOTO TAMBAHAN --}}
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Foto Tambahan
+                    </label>
+
+                    <input type="file"
+                           name="fotos[]"
+                           class="form-control"
+                           accept="image/*"
+                           multiple>
+
+                    <div class="form-text">
+                        Kamu dapat memilih beberapa foto sekaligus.
+                    </div>
+
+                </div>
+
+
+                {{-- FOTO LAMA --}}
+                @if($produk->fotos && $produk->fotos->count() > 0)
+
+                    <div class="mt-4">
+
+                        <h6 class="fw-bold">
+                            Foto Tambahan Saat Ini
+                        </h6>
+
+                        <div class="row">
+
+                            @foreach($produk->fotos as $foto)
+
+                                <div class="col-md-3 mb-3">
+
+                                    <div class="card border">
+
+                                        <img src="{{ asset('produk/' . $foto->foto) }}"
+                                             class="card-img-top"
+                                             style="height:180px;object-fit:cover;">
+
+                                    </div>
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+                    </div>
+
+                @endif
+
+
+                <hr>
+
+
+                {{-- BUTTON --}}
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <a href="{{ route('produk.index') }}"
+                       class="btn btn-secondary">
+
+                        Batal
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        💾 Simpan Perubahan
+
+                    </button>
+
+                </div>
 
             </form>
 
@@ -242,5 +386,4 @@
 
 </div>
 
-</body>
-</html>
+@endsection

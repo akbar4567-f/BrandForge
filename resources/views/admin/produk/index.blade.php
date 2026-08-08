@@ -1,24 +1,20 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Data Produk</title>
+@extends('layouts.app')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+@section('title', 'Data Produk')
 
-</head>
+@section('content')
 
-<body class="bg-light">
+<div class="container py-4">
 
-<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <div class="d-flex justify-content-between mb-3">
-
-        <h2>📦 Data Produk</h2>
+        <h2 class="fw-bold">
+            📦 Data Produk
+        </h2>
 
         <div>
 
-            <a href="/admin" class="btn btn-secondary">
+            <a href="{{ route('admin.index') }}" class="btn btn-secondary">
                 Dashboard
             </a>
 
@@ -38,101 +34,139 @@
 
     @endif
 
-    <table class="table table-bordered table-striped">
+    <div class="card shadow">
 
-        <thead class="table-dark">
+        <div class="card-body">
 
-        <tr>
+            <div class="table-responsive">
 
-            <th>No</th>
+                <table class="table table-bordered table-hover align-middle">
 
-            <th>Foto</th>
+                    <thead class="table-dark text-center">
 
-            <th>Nama</th>
+                        <tr>
 
-            <th>Kategori</th>
+                            <th width="60">No</th>
+                            <th width="90">Foto</th>
+                            <th>Nama Produk</th>
+                            <th>Kategori</th>
+                            <th>Koleksi</th>
+                            <th>Harga</th>
+                            <th>Modal</th>
+                            <th width="170">Aksi</th>
 
-            <th>Harga</th>
+                        </tr>
 
-            <th>Aksi</th>
+                    </thead>
 
-        </tr>
+                    <tbody>
 
-        </thead>
+                    @forelse($produks as $produk)
 
-        <tbody>
+                        <tr>
 
-        @forelse($produks as $produk)
+                            <td class="text-center">
+                                {{ $loop->iteration }}
+                            </td>
 
-        <tr>
+                            <td class="text-center">
 
-            <td>{{ $loop->iteration }}</td>
+                                @if($produk->foto)
 
-            <td>
+                                    <img
+                                        src="{{ asset('produk/'.$produk->foto) }}"
+                                        class="img-thumbnail"
+                                        width="70">
 
-                @if($produk->foto)
+                                @else
 
-                    <img src="{{ asset('produk/'.$produk->foto) }}"
-                         width="80">
+                                    <span class="text-muted">
+                                        -
+                                    </span>
 
-                @endif
+                                @endif
 
-            </td>
+                            </td>
 
-            <td>{{ $produk->nama_produk }}</td>
+                            <td>
 
-            <td>{{ $produk->kategori->nama_kategori }}</td>
+                                <strong>
+                                    {{ $produk->nama_produk }}
+                                </strong>
 
-            <td>Rp {{ number_format($produk->harga, 0, ',', '.') }}</td>
-            <td>
+                            </td>
 
-                <a href="{{ route('produk.edit',$produk->id) }}"
-                   class="btn btn-warning btn-sm">
+                            <td>
+                                {{ $produk->kategori->nama_kategori ?? '-' }}
+                            </td>
 
-                    Edit
+                            <td>
+                                {{ $produk->koleksi->nama_koleksi ?? '-' }}
+                            </td>
 
-                </a>
+                            <td>
+                                Rp {{ number_format($produk->harga,0,',','.') }}
+                            </td>
 
-                <form action="{{ route('produk.destroy',$produk->id) }}"
-                      method="POST"
-                      class="d-inline">
+                            <td>
+                                Rp {{ number_format($produk->modal_produk,0,',','.') }}
+                            </td>
 
-                    @csrf
-                    @method('DELETE')
+                            <td class="text-center">
 
-                    <button
-                        onclick="return confirm('Hapus produk?')"
-                        class="btn btn-danger btn-sm">
+                                <a href="{{ route('produk.edit',$produk->id) }}"
+                                   class="btn btn-warning btn-sm">
 
-                        Hapus
+                                    Edit
 
-                    </button>
+                                </a>
 
-                </form>
+                                <form
+                                    action="{{ route('produk.destroy',$produk->id) }}"
+                                    method="POST"
+                                    class="d-inline">
 
-            </td>
+                                    @csrf
+                                    @method('DELETE')
 
-        </tr>
+                                    <button
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Yakin ingin menghapus produk ini?')">
 
-        @empty
+                                        Hapus
 
-        <tr>
+                                    </button>
 
-            <td colspan="6" class="text-center">
+                                </form>
 
-                Belum ada produk.
+                            </td>
 
-            </td>
+                        </tr>
 
-        </tr>
+                    @empty
 
-        @endforelse
+                        <tr>
 
-        </tbody>
+                            <td colspan="8" class="text-center">
 
-    </table>
+                                Belum ada data produk.
+
+                            </td>
+
+                        </tr>
+
+                    @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-</body>
-</html>
+@endsection
