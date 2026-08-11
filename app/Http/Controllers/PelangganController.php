@@ -48,7 +48,7 @@
                     ->take(8)
                     ->get();
 
-                // ⭐ Produk Rekomendasi
+                //  Produk Rekomendasi
                 $produkRekomendasi = Produk::with([
                     'kategori',
                     'koleksi',
@@ -339,161 +339,189 @@
 
                     return view('pelanggan.checkout', compact('keranjangs', 'total'));
                 }
-                // PROSES CHECKOUT
-                public function prosesCheckout(Request $request)
-                {
-                        $keranjang = Keranjang::with([
-                        'produk.kategori',
-                        'produk.koleksi',
-                        'ukuran',
-                        'warna'
-                    ])
-                    ->where('user_id', Auth::id())
-                    ->get();
+              // PROSES CHECKOUT
+    public function prosesCheckout(Request $request)
+    {
+        $keranjang = Keranjang::with([
+            'produk.kategori',
+            'produk.koleksi',
+            'ukuran',
+            'warna'
+        ])
+        ->where('user_id', Auth::id())
+        ->get();
 
-                    if ($keranjang->count() == 0) {
-                        return back()->with('error', 'Keranjang masih kosong.');
-                    }
-                        $totalProduk = 0;
+        // Cek keranjang
+        if ($keranjang->count() == 0) {
+            return redirect()
+                ->route('pelanggan.keranjang')
+                ->with('error', 'Keranjang masih kosong.');
+        }
 
-                        foreach ($keranjang as $item) {
-                            $totalProduk += $item->produk->harga * $item->jumlah;
-                        }
+        // Hitung total produk
+        $totalProduk = 0;
 
+        foreach ($keranjang as $item) {
 
-                    // Ongkir dipilih setelah alamat
-                        $ongkir = 10000;
+            if (!$item->produk) {
+                return back()->with(
+                    'error',
+                    'Produk tidak ditemukan.'
+                );
+            }
 
+            $totalProduk += $item->produk->harga * $item->jumlah;
+        }
 
-                        // Total sementara
-                        $total = $totalProduk + $ongkir;
-                        $transaksi = Transaksi::create([
-                        'user_id' => Auth::id(),
-                        'kode_transaksi' => 'TRX'.strtoupper(Str::random(10)),
-                        'tanggal_transaksi' => now(),
+        // Ongkir sementara
+        $ongkir = 10000;
 
-                        'nama_penerima' => '-',
-                        'alamat' => '-',
-                        'no_hp' => '-',
+        // Total
+        $total = $totalProduk + $ongkir;
 
-                        'total_harga' => $totalProduk,
-                        'ongkir' => $ongkir,
-                        'bayar' => 0,
-                        'kembalian' => 0,   
-                        'status' => 'Belum Bayar',
-                    ]);
+        // Buat transaksi
+        $transaksi = Transaksi::create([
+            'user_id'          => Auth::id(),
+            'kode_transaksi'   => 'TRX' . strtoupper(Str::random(10)),
+            'tanggal_transaksi'=> now(),
 
-               Pengiriman::create([
-                    'transaksi_id' => $transaksi->id,
-                    'ongkir' => $ongkir,
-                    'nomor_resi' => null,
-                    'status' => 'menunggu',
-                ]);
-                                foreach ($keranjang as $item) {
+            'nama_penerima'    => '-',
+            'alamat'           => '-',
+            'no_hp'            => '-',
 
-                    $stok = Stok::where('produk_id', $item->produk_id)
-                    ->where('ukuran_id', $item->ukuran_id)
-                    ->where('warna_id', $item->warna_id)
-                    ->first();
+            'total_harga'      => $totalProduk,
+            'ongkir'           => $ongkir,
 
-                    if (!$stok) {
-                        return back()->with('error', 'Stok produk tidak ditemukan.');
-                    }
+            'bayar'            => 0,
+            'kembalian'        => 0,
 
-                    if ($stok->jumlah < $item->jumlah) {
-                        return back()->with('error', 'Stok produk tidak mencukupi.');
-                    }
-
-                        DetailTransaksi::create([
-                        'transaksi_id' => $transaksi->id,
-                        'stok_id'      => $stok->id,
-                        'produk_id'    => $item->produk_id,
-                        'warna_id'     => $item->warna_id,
-                        'ukuran_id'    => $item->ukuran_id,
-                        'jumlah'       => $item->jumlah,
-                        'harga'        => $item->produk->harga,
-                        'subtotal'     => $item->produk->harga * $item->jumlah,
-                    ]);
-                    $stok->decrement('jumlah', $item->jumlah);
-                }
-
-                    Keranjang::where('user_id', Auth::id())->delete();
-
-                    return redirect()->route('pelanggan.alamat', $transaksi->id);
-                }
-
-                //Alamat
-            public function alamat($id)
-                {
-                    $transaksi = Transaksi::where('user_id', Auth::id())
-                                    ->findOrFail($id);
-
-                    return view('pelanggan.alamat', compact('transaksi'));
-                }
-
-
-
-                // SIMPAN ALAMAT
-
-                public function simpanAlamat(Request $request, $id)
-        {
-            $request->validate([
-                'nama_penerima' => 'required',
-                'alamat' => 'required',
-                'no_hp' => 'required',
-                'kurir' => 'required',
-                'layanan' => 'required',
-            ]);
-
-        $transaksi = Transaksi::where('user_id', Auth::id())
-                        ->with('detailTransaksi')
-                        ->findOrFail($id);
-
-            $hargaProduk = $transaksi->detailTransaksi->sum(function($item){
-            return $item->harga * $item->jumlah;
-        });
-
-
-        $ongkir = 10000; // sementara ongkir manual
-
-        $total = $hargaProduk + $ongkir;
-
-
-    $transaksi->update([
-        'nama_penerima' => $request->nama_penerima,
-        'alamat' => $request->alamat,
-        'no_hp' => $request->no_hp,
-        'ongkir' => 10000,
-        'total_harga' => $hargaProduk,
-    ]);
-
-    $transaksi->refresh();
-
-    //dd($transaksi->ongkir);
-
-            Pengiriman::updateOrCreate(
-                [
-                    'transaksi_id'=>$transaksi->id
-                ],
-            [
-                'kurir'=>$request->kurir,
-                'layanan'=>$request->layanan,
-                'ongkir' => $ongkir,
-                'nomor_resi'=>null,
-                'status'=>'menunggu',
-            ]
-            );
-        session([
-            'ongkir' => $ongkir,
-            'kurir' => $request->kurir,
-            'layanan' => $request->layanan
+            'status'           => 'Belum Bayar',
         ]);
 
+        // Buat data pengiriman
+        Pengiriman::create([
+            'transaksi_id' => $transaksi->id,
+            'ongkir'       => $ongkir,
+            'nomor_resi'   => null,
+            'status'       => 'menunggu',
+        ]);
 
-            return redirect()
-                ->route('pelanggan.pembayaran',$transaksi->id);
+        // Simpan detail transaksi
+        foreach ($keranjang as $item) {
+
+            $stok = Stok::where('produk_id', $item->produk_id)
+                ->where('ukuran_id', $item->ukuran_id)
+                ->where('warna_id', $item->warna_id)
+                ->first();
+
+            if (!$stok) {
+                return back()->with(
+                    'error',
+                    'Stok produk ' . $item->produk->nama_produk . ' tidak ditemukan.'
+                );
+            }
+
+            if ($stok->jumlah < $item->jumlah) {
+                return back()->with(
+                    'error',
+                    'Stok produk ' . $item->produk->nama_produk . ' tidak mencukupi.'
+                );
+            }
+
+            DetailTransaksi::create([
+                'transaksi_id' => $transaksi->id,
+                'stok_id'      => $stok->id,
+                'produk_id'    => $item->produk_id,
+                'warna_id'     => $item->warna_id,
+                'ukuran_id'    => $item->ukuran_id,
+                'jumlah'       => $item->jumlah,
+                'harga'        => $item->produk->harga,
+                'subtotal'     => $item->produk->harga * $item->jumlah,
+            ]);
+
+            // Kurangi stok
+            $stok->decrement('jumlah', $item->jumlah);
         }
-                // HALAMAN PEMBAYARAN
+
+        // Hapus isi keranjang setelah transaksi berhasil dibuat
+        Keranjang::where('user_id', Auth::id())->delete();
+
+        // LANGSUNG KE HALAMAN ALAMAT
+        return redirect()
+            ->route('pelanggan.alamat', $transaksi->id)
+            ->with('success', 'Checkout berhasil. Silakan isi alamat pengiriman.');
+        }
+
+                    //Alamat
+                public function alamat($id)
+                    {
+                        $transaksi = Transaksi::where('user_id', Auth::id())
+                                        ->findOrFail($id);
+
+                        return view('pelanggan.alamat', compact('transaksi'));
+                    }
+
+
+
+                    // SIMPAN ALAMAT
+                     public function simpanAlamat(Request $request, $id)
+                    {
+                        $request->validate([
+                            'nama_penerima' => 'required|string|max:255',
+                            'alamat' => 'required|string',
+                            'no_hp' => 'required|string|max:20',
+                            'kurir' => 'required|string',
+                            'layanan' => 'required|string',
+                        ]);
+
+                        $transaksi = Transaksi::where('user_id', Auth::id())
+                            ->with('detailTransaksi')
+                            ->findOrFail($id);
+
+                        $hargaProduk = $transaksi->detailTransaksi->sum(function ($item) {
+                            return $item->harga * $item->jumlah;
+                        });
+
+                        // Ongkir sementara
+                        $ongkir = 10000;
+
+                        // Total produk + ongkir
+                        $total = $hargaProduk + $ongkir;
+
+                        $transaksi->update([
+                            'nama_penerima' => $request->nama_penerima,
+                            'alamat' => $request->alamat,
+                            'no_hp' => $request->no_hp,
+                            'ongkir' => $ongkir,
+                            'total_harga' => $total,
+                        ]);
+
+                        Pengiriman::updateOrCreate(
+                            [
+                                'transaksi_id' => $transaksi->id,
+                            ],
+                            [
+                                'kurir' => $request->kurir,
+                                'layanan' => $request->layanan,
+                                'ongkir' => $ongkir,
+                                'nomor_resi' => null,
+                                'status' => 'menunggu',
+                            ]
+                        );
+
+                        session([
+                            'ongkir' => $ongkir,
+                            'kurir' => $request->kurir,
+                            'layanan' => $request->layanan,
+                        ]);
+
+                        return redirect()->route(
+                            'pelanggan.pembayaran',
+                            $transaksi->id
+                        );
+                    }
+
+                    // HALAMAN PEMBAYARAN
                     public function pembayaran($id)
                     {
                         $transaksi = Transaksi::where('user_id', Auth::id())

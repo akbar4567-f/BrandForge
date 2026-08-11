@@ -791,7 +791,7 @@
                             @if($produk->foto)
 
                                 <img
-                                    src="{{ asset('storage/'.$produk->foto) }}"
+                                    src="{{asset('produk/'.$produk->foto) }}"
                                     class="product-image"
                                     alt="{{ $produk->nama_produk }}"
                                 >
@@ -892,7 +892,7 @@
                             @if($produk->foto)
 
                                 <img
-                                    src="{{ asset('storage/'.$produk->foto) }}"
+                                    src="{{ asset('produk/'.$produk->foto) }}"
                                     class="product-image"
                                     alt="{{ $produk->nama_produk }}"
                                 >
@@ -999,7 +999,7 @@
                             @if($produk->foto)
 
                                 <img
-                                    src="{{ asset('storage/'.$produk->foto) }}"
+                                    src="{{asset('produk/'.$produk->foto) }}"
                                     class="product-image"
                                     alt="{{ $produk->nama_produk }}"
                                 >

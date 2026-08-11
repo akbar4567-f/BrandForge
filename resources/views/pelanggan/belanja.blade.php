@@ -142,7 +142,7 @@
                 <div class="card h-100 shadow-sm">
 
                     @if($produk->foto)
-                        <img src="{{ asset('storage/'.$produk->foto) }}"
+                        <img src="{{ asset('produk/'.$produk->foto) }}"
                              class="card-img-top"
                              style="height:250px;object-fit:cover;">
                     @else

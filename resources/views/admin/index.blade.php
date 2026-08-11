@@ -189,11 +189,6 @@
 
             <div class="col-md-4 text-md-end header-buttons">
 
-                <a href="{{ route('website.home') }}"
-                   class="btn btn-light me-1">
-                    🌐 Website
-                </a>
-
                 @if(auth()->user()->role == 'owner')
 
                     <a href="{{ route('owner.index') }}"

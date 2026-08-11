@@ -15,7 +15,7 @@
         <div class="col-md-5">
 
             @if($produk->foto)
-                <img src="{{ asset('storage/'.$produk->foto) }}"
+                <img src="{{ asset('produk/'.$produk->foto) }}"
                      class="img-fluid rounded shadow">
             @else
                 <img src="https://via.placeholder.com/500x500?text=Produk"

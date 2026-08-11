@@ -839,21 +839,6 @@ body {
 
         <div class="header-actions">
 
-
-            <!-- Website -->
-
-            <a
-                href="{{ route('website.home') }}"
-                class="btn-website"
-            >
-
-                <i class="bi bi-globe"></i>
-
-                Website
-
-            </a>
-
-
             <!-- Logout -->
 
             <form

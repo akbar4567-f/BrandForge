@@ -777,15 +777,6 @@
     <div class="status-actions">
 
         <a
-            href="{{ route('website.home') }}"
-            class="action-button action-website"
-        >
-            <i class="bi bi-globe"></i>
-            Website
-        </a>
-
-
-        <a
             href="{{ route('pelanggan.riwayat') }}"
             class="action-button action-history"
         >

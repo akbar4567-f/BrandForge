@@ -281,22 +281,4 @@
 
         });
 
-
-        // WEBSITE 
-
-        Route::get('/website', [WebsiteController::class, 'home'])
-            ->name('website.home');
-
-        Route::get('/website/tentang', [WebsiteController::class, 'tentang'])
-            ->name('website.tentang');
-
-        Route::get('/website/produk', [WebsiteController::class, 'produk'])
-            ->name('website.produk');
-
-        Route::get('/website/produk/{id}', [WebsiteController::class, 'detail'])
-            ->name('website.detail');
-
-        Route::get('/website/kontak', [WebsiteController::class, 'kontak'])
-            ->name('website.kontak');
-
     require __DIR__.'/auth.php';

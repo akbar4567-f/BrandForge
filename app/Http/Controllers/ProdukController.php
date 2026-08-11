@@ -3,6 +3,7 @@
     namespace App\Http\Controllers;
 
     use App\Models\Produk;
+    use App\Models\ProdukFoto;
     use App\Models\Kategori;
     use App\Models\Koleksi;
     use Illuminate\Http\Request;

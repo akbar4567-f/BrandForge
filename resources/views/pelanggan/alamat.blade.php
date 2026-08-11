@@ -1,3 +1,4 @@
+```blade
 @extends('layouts.app')
 
 @section('title','Alamat Pengiriman')
@@ -8,77 +9,101 @@
 
     <div class="row justify-content-center">
 
-        <div class="col-md-6">
+        <div class="col-md-7">
 
-            <div class="card shadow">
+            <div class="card shadow border-0">
 
                 <div class="card-header bg-primary text-white">
-                    📍 Alamat Pengiriman
+                    <h5 class="mb-0">
+                        📍 Alamat Pengiriman
+                    </h5>
                 </div>
 
                 <div class="card-body">
-                        @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
 
-                    <form action="{{ route('pelanggan.simpanAlamat', $transaksi->id) }}" method="POST">
+                    {{-- ERROR --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+
+                    {{-- INFO --}}
+                    <div class="alert alert-info">
+                        <strong>Data pengiriman</strong>
+
+                        <br>
+
+                        Nama, alamat, dan nomor WhatsApp
+                        diambil dari data akun kamu.
+                    </div>
+
+
+                    <form action="{{ route('pelanggan.simpanAlamat', $transaksi->id) }}"
+                          method="POST">
 
                         @csrf
 
+
+                        {{-- NAMA --}}
                         <div class="mb-3">
-                            <label class="form-label">
+
+                            <label class="form-label fw-bold">
                                 Nama Penerima
                             </label>
 
                             <input type="text"
                                    name="nama_penerima"
                                    class="form-control"
-                                   placeholder="Masukkan nama penerima"
-                                   value="{{ old('nama_penerima') }}"
+                                   value="{{ old('nama_penerima', Auth::user()->name) }}"
+                                   placeholder="Nama penerima"
                                    required>
+
                         </div>
 
 
+                        {{-- ALAMAT --}}
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-bold">
                                 Alamat Lengkap
                             </label>
 
                             <textarea name="alamat"
                                       class="form-control"
                                       rows="4"
-                                      placeholder="Contoh: Jalan, Kecamatan, Kota Bandung"
-                                      required>{{ old('alamat') }}</textarea>
+                                      placeholder="Alamat lengkap"
+                                      required>{{ old('alamat', Auth::user()->alamat) }}</textarea>
 
                         </div>
 
 
+                        {{-- NOMOR HP --}}
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-bold">
                                 No WhatsApp
                             </label>
 
                             <input type="text"
                                    name="no_hp"
                                    class="form-control"
+                                   value="{{ old('no_hp', Auth::user()->no_hp) }}"
                                    placeholder="08xxxxxxxxxx"
-                                   value="{{ old('no_hp') }}"
                                    required>
 
                         </div>
 
 
+                        {{-- KURIR --}}
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-bold">
                                 Pilih Kurir
                             </label>
 
@@ -90,19 +115,23 @@
                                     -- Pilih Kurir --
                                 </option>
 
-                                <option value="JNE">
+                                <option value="JNE"
+                                    {{ old('kurir') == 'JNE' ? 'selected' : '' }}>
                                     JNE
                                 </option>
 
-                                <option value="J&T">
+                                <option value="J&T"
+                                    {{ old('kurir') == 'J&T' ? 'selected' : '' }}>
                                     J&T
                                 </option>
 
-                                <option value="SiCepat">
+                                <option value="SiCepat"
+                                    {{ old('kurir') == 'SiCepat' ? 'selected' : '' }}>
                                     SiCepat
                                 </option>
 
-                                <option value="AnterAja">
+                                <option value="AnterAja"
+                                    {{ old('kurir') == 'AnterAja' ? 'selected' : '' }}>
                                     AnterAja
                                 </option>
 
@@ -111,9 +140,10 @@
                         </div>
 
 
+                        {{-- LAYANAN --}}
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-bold">
                                 Pilih Layanan
                             </label>
 
@@ -125,15 +155,18 @@
                                     -- Pilih Layanan --
                                 </option>
 
-                                <option value="REG">
+                                <option value="REG"
+                                    {{ old('layanan') == 'REG' ? 'selected' : '' }}>
                                     REG
                                 </option>
 
-                                <option value="YES">
+                                <option value="YES"
+                                    {{ old('layanan') == 'YES' ? 'selected' : '' }}>
                                     YES
                                 </option>
 
-                                <option value="Express">
+                                <option value="Express"
+                                    {{ old('layanan') == 'Express' ? 'selected' : '' }}>
                                     Express
                                 </option>
 
@@ -142,9 +175,13 @@
                         </div>
 
 
+                        <hr>
+
+
+                        {{-- TOMBOL --}}
                         <div class="d-flex justify-content-between">
 
-                            <a href="{{ route('pelanggan.belanja') }}"
+                            <a href="{{ route('pelanggan.checkout') }}"
                                class="btn btn-secondary">
 
                                 ← Kembali
@@ -161,7 +198,6 @@
 
                         </div>
 
-
                     </form>
 
                 </div>
@@ -174,5 +210,5 @@
 
 </div>
 
-
 @endsection
+```

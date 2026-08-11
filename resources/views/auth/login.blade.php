@@ -34,6 +34,53 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
+        {{-- Nama --}}
+<div class="mt-4">
+    <x-input-label for="name" value="Nama Lengkap" />
+
+    <x-text-input
+        id="name"
+        class="block mt-1 w-full"
+        type="text"
+        name="name"
+        :value="old('name')"
+        required
+    />
+
+    <x-input-error :messages="$errors->get('name')" class="mt-2" />
+</div>
+
+{{-- Alamat --}}
+<div class="mt-4">
+    <x-input-label for="alamat" value="Alamat" />
+
+    <textarea
+        id="alamat"
+        name="alamat"
+        class="block mt-1 w-full border-gray-300 rounded-md"
+        rows="3"
+        required>{{ old('alamat') }}</textarea>
+
+    <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
+</div>
+
+{{-- No Telepon --}}
+<div class="mt-4">
+    <x-input-label for="no_hp" value="No. Telepon" />
+
+    <x-text-input
+        id="no_hp"
+        class="block mt-1 w-full"
+        type="text"
+        name="no_hp"
+        :value="old('no_hp')"
+        placeholder="08xxxxxxxxxx"
+        required
+    />
+
+    <x-input-error :messages="$errors->get('no_hp')" class="mt-2" />
+</div>
+
         <!-- Remember Me -->
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">

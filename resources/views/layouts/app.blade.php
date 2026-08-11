@@ -164,10 +164,6 @@
 
                 <a href="{{ url('/admin') }}" class="{{ request()->is('admin') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-                <a href="{{ route('website.home') }}">
-                    <i class="bi bi-globe"></i> Website
-                </a>
 
                 <a href="{{ route('kategori.index') }}">
                     <i class="bi bi-tags"></i> Kategori
@@ -190,9 +186,6 @@
                 <a href="{{ route('kasir.index') }}">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
-                <a href="{{ route('website.home') }}">
-                        <i class="bi bi-globe"></i> Website
-                    </a>
 
                 <a href="{{ route('kasir.transaksi') }}">
                     <i class="bi bi-cart-check"></i> Transaksi

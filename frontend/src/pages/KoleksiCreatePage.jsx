@@ -73,7 +73,7 @@ function KoleksiCreatePage() {
                     </tbody>
                 </table>
             </form>
-        </div>
+        </div>  
     );
 }
 
